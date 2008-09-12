@@ -104,7 +104,7 @@
 #	define CONFIG_OVERWRITE_ETHADDR_ONCE
 #endif				/* CONFIG_MCFFEC */
 
-#define CONFIG_HOSTNAME		M5272C3
+#define CONFIG_HOSTNAME		M5282EVB
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	"netdev=eth0\0"				\
 	"loadaddr=10000\0"			\
@@ -134,7 +134,7 @@
 #define CFG_MEMTEST_START	0x400
 #define CFG_MEMTEST_END		0x380000
 
-#define CFG_HZ			1000000
+#define CFG_HZ			1000
 #define	CFG_CLK			64000000
 
 /* PLL Configuration: Ext Clock * 6 (see table 9-4 of MCF user manual) */
@@ -194,7 +194,7 @@
 #define CFG_FLASH_CFI
 #ifdef CFG_FLASH_CFI
 
-#	define CFG_FLASH_CFI_DRIVER	1
+#	define CONFIG_FLASH_CFI_DRIVER	1
 #	define CFG_FLASH_SIZE		0x1000000	/* Max size that the board might have */
 #	define CFG_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
 #	define CFG_MAX_FLASH_BANKS	1	/* max number of memory banks */

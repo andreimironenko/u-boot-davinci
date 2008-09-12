@@ -315,6 +315,10 @@ Daniel Poirot <dan.poirot@windriver.com>
 	sbc8240		MPC8240
 	sbc405		PPC405GP
 
+Ricardo Ribalda <ricardo.ribalda@uam.es>
+
+	ml507 		PPC440x5
+
 Stefan Roese <sr@denx.de>
 
 	P3M7448		MPC7448
@@ -424,6 +428,9 @@ John Zhan <zhanz@sinovee.com>
 
 	svm_sc8xx	MPC8xx
 
+Feng Kan <fkan@amcc.com>
+
+	redwood			PPC4xx
 -------------------------------------------------------------------------
 
 Unknown / orphaned boards:
@@ -691,6 +698,7 @@ TsiChung Liew <Tsi-Chung.Liew@freescale.com>
 
 	M52277EVB	mcf5227x
 	M5235EVB	mcf52x2
+	M5253DEMO	mcf52x2
 	M5329EVB	mcf532x
 	M5373EVB	mcf532x
 	M54455EVB	mcf5445x
@@ -704,7 +712,20 @@ TsiChung Liew <Tsi-Chung.Liew@freescale.com>
 #	Board		CPU						#
 #########################################################################
 
-Haavard Skinnemoen <hskinnemoen@atmel.com>
+Hans-Christian Egtvedt <hans-christian.egtvedt@atmel.com>
+
+	FAVR-32-EZKIT		AT32AP7000
+
+Mark Jackson <mpfj@mimc.co.uk>
+
+	MIMC200			AT32AP7000
+
+Alex Raimondi <alex.raimondi@miromico.ch>
+Julien May <julien.may@miromico.ch>
+
+	HAMMERHEAD		AT32AP7000
+
+Haavard Skinnemoen <haavard.skinnemoen@atmel.com>
 
 	ATSTK1000	AT32AP7xxx
 	ATSTK1002	AT32AP7000

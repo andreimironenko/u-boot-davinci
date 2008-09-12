@@ -119,11 +119,13 @@ typedef volatile unsigned char	vu_char;
 #define debugX(level,fmt,args...)
 #endif	/* DEBUG */
 
+#ifndef BUG
 #define BUG() do { \
 	printf("BUG: failure at %s:%d/%s()!\n", __FILE__, __LINE__, __FUNCTION__); \
 	panic("BUG!"); \
 } while (0)
 #define BUG_ON(condition) do { if (unlikely((condition)!=0)) BUG(); } while(0)
+#endif /* BUG */
 
 typedef void (interrupt_handler_t)(void *);
 
@@ -222,7 +224,6 @@ void	board_init_r  (gd_t *, ulong) __attribute__ ((noreturn));
 int	checkboard    (void);
 int	checkflash    (void);
 int	checkdram     (void);
-char *	strmhz(char *buf, long hz);
 int	last_stage_init(void);
 extern ulong monitor_flash_len;
 int mac_read_from_eeprom(void);
@@ -612,6 +613,9 @@ void	panic(const char *fmt, ...)
 int	sprintf(char * buf, const char *fmt, ...)
 		__attribute__ ((format (__printf__, 2, 3)));
 int	vsprintf(char *buf, const char *fmt, va_list args);
+
+/* lib_generic/strmhz.c */
+char *	strmhz(char *buf, long hz);
 
 /* lib_generic/crc32.c */
 uint32_t crc32 (uint32_t, const unsigned char *, uint);

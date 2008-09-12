@@ -209,6 +209,8 @@ LIST_4xx="		\
 	MIP405T		\
 	ML2		\
 	ml300		\
+	ml507		\
+	ml507_flash	\
 	ocotea		\
 	OCRTC		\
 	ORSG		\
@@ -222,6 +224,7 @@ LIST_4xx="		\
 	PPChameleonEVB	\
 	quad100hd	\
 	rainier		\
+	redwood		\
 	sbc405		\
 	sc3		\
 	sequoia		\
@@ -691,6 +694,7 @@ LIST_coldfire="			\
 	M52277EVB		\
 	M5235EVB		\
 	M5249EVB		\
+	M5253DEMO		\
 	M5253EVBE		\
 	M5271EVB		\
 	M5272C3			\
@@ -698,6 +702,7 @@ LIST_coldfire="			\
 	M5282EVB		\
 	M5329AFEE		\
 	M5373EVB		\
+	M54451EVB		\
 	M54455EVB		\
 	M5475AFE		\
 	M5485AFE		\
@@ -714,6 +719,9 @@ LIST_avr32="		\
 	atstk1004	\
 	atstk1006	\
 	atngw100	\
+	favr-32-ezkit	\
+	hammerhead	\
+	mimc200		\
 "
 
 #########################################################################

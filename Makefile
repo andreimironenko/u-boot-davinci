@@ -141,7 +141,7 @@ ifeq ($(ARCH),ppc)
 CROSS_COMPILE = ppc_8xx-
 endif
 ifeq ($(ARCH),arm)
-CROSS_COMPILE = arm-linux-
+CROSS_COMPILE = arm-none-linux-gnueabi-
 endif
 ifeq ($(ARCH),i386)
 CROSS_COMPILE = i386-linux-
@@ -210,7 +210,7 @@ LIBS += cpu/ixp/npe/libnpe.a
 endif
 LIBS += lib_$(ARCH)/lib$(ARCH).a
 LIBS += fs/cramfs/libcramfs.a fs/fat/libfat.a fs/fdos/libfdos.a fs/jffs2/libjffs2.a \
-	fs/reiserfs/libreiserfs.a fs/ext2/libext2fs.a
+	fs/reiserfs/libreiserfs.a fs/ext2/libext2fs.a fs/yaffs2/libyaffs2.a
 LIBS += net/libnet.a
 LIBS += disk/libdisk.a
 LIBS += drivers/bios_emulator/libatibiosemu.a
@@ -378,6 +378,7 @@ TAG_SUBDIRS += fs/cramfs
 TAG_SUBDIRS += fs/fat
 TAG_SUBDIRS += fs/fdos
 TAG_SUBDIRS += fs/jffs2
+TAG_SUBDIRS += fs/yaffs2
 TAG_SUBDIRS += net
 TAG_SUBDIRS += disk
 TAG_SUBDIRS += common
@@ -458,6 +459,8 @@ CHANGELOG:
 	git log --no-merges U-Boot-1_1_5.. | \
 	unexpand -a | sed -e 's/\s\s*$$//' > $@
 
+include/license.h: tools/bin2header COPYING
+	 cat COPYING | gzip -9 -c | ./tools/bin2header license_gzip > include/license.h
 #########################################################################
 
 unconfig:
@@ -1348,6 +1351,17 @@ ML2_config:	unconfig
 ml300_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) ppc ppc4xx ml300 xilinx
 
+ml507_flash_config:	unconfig
+	@mkdir -p $(obj)include $(obj)board/xilinx/ml507
+	@cp $(obj)board/xilinx/ml507/u-boot-rom.lds  $(obj)board/xilinx/ml507/u-boot.lds
+	@echo "TEXT_BASE = 0xFE360000" > $(obj)board/xilinx/ml507/config.tmp
+	@$(MKCONFIG) $(@:_flash_config=) ppc ppc4xx ml507 xilinx
+
+ml507_config:	unconfig
+	@mkdir -p $(obj)include $(obj)board/xilinx/ml507
+	@cp $(obj)board/xilinx/ml507/u-boot-ram.lds  $(obj)board/xilinx/ml507/u-boot.lds
+	@$(MKCONFIG) $(@:_config=) ppc ppc4xx ml507 xilinx
+
 ocotea_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) ppc ppc4xx ocotea amcc
 
@@ -1408,6 +1422,9 @@ PPChameleonEVB_HI_33_config:	unconfig
 
 quad100hd_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) ppc ppc4xx quad100hd
+
+redwood_config: unconfig
+	@$(MKCONFIG) $(@:_config=) ppc ppc4xx redwood amcc
 
 sbc405_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) ppc ppc4xx sbc405
@@ -1836,6 +1853,9 @@ M5235EVB_Flash32_config:	unconfig
 M5249EVB_config :		unconfig
 	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5249evb freescale
 
+M5253DEMO_config :		unconfig
+	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5253demo freescale
+
 M5253EVBE_config :		unconfig
 	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5253evbe freescale
 
@@ -1858,16 +1878,16 @@ idmr_config :			unconfig
 	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 idmr
 
 M5271EVB_config :		unconfig
-	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5271evb
+	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5271evb freescale
 
 M5272C3_config :		unconfig
-	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5272c3
+	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5272c3 freescale
 
 M5275EVB_config :		unconfig
 	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5275evb freescale
 
 M5282EVB_config :		unconfig
-	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5282evb
+	@$(MKCONFIG) $(@:_config=) m68k mcf52x2 m5282evb freescale
 
 M5329AFEE_config \
 M5329BFEE_config :	unconfig
@@ -1889,13 +1909,38 @@ M5373EVB_config :	unconfig
 	fi
 	@$(MKCONFIG) -a M5373EVB m68k mcf532x m5373evb freescale
 
+M54451EVB_config \
+M54451EVB_spansion_config \
+M54451EVB_stmicro_config :	unconfig
+	@case "$@" in \
+	M54451EVB_config)		FLASH=SPANSION;; \
+	M54451EVB_spansion_config)	FLASH=SPANSION;; \
+	M54451EVB_stmicro_config)	FLASH=STMICRO;; \
+	esac; \
+	if [ "$${FLASH}" = "SPANSION" ] ; then \
+		echo "#define CFG_SPANSION_BOOT"	>> $(obj)include/config.h ; \
+		echo "TEXT_BASE = 0x00000000" > $(obj)board/freescale/m54451evb/config.tmp ; \
+		cp $(obj)board/freescale/m54451evb/u-boot.spa $(obj)board/freescale/m54451evb/u-boot.lds ; \
+		$(XECHO) "... with SPANSION boot..." ; \
+	fi; \
+	if [ "$${FLASH}" = "STMICRO" ] ; then \
+		echo "#define CONFIG_CF_SBF"	>> $(obj)include/config.h ; \
+		echo "#define CFG_STMICRO_BOOT"	>> $(obj)include/config.h ; \
+		echo "TEXT_BASE = 0x47E00000" > $(obj)board/freescale/m54451evb/config.tmp ; \
+		cp $(obj)board/freescale/m54451evb/u-boot.stm $(obj)board/freescale/m54451evb/u-boot.lds ; \
+		$(XECHO) "... with ST Micro boot..." ; \
+	fi; \
+	echo "#define CFG_INPUT_CLKSRC 24000000" >> $(obj)include/config.h ;
+	@$(MKCONFIG) -a M54451EVB m68k mcf5445x m54451evb freescale
+
 M54455EVB_config \
 M54455EVB_atmel_config \
 M54455EVB_intel_config \
 M54455EVB_a33_config \
 M54455EVB_a66_config \
 M54455EVB_i33_config \
-M54455EVB_i66_config :	unconfig
+M54455EVB_i66_config \
+M54455EVB_stm33_config :	unconfig
 	@case "$@" in \
 	M54455EVB_config)		FLASH=ATMEL; FREQ=33333333;; \
 	M54455EVB_atmel_config)		FLASH=ATMEL; FREQ=33333333;; \
@@ -1904,17 +1949,26 @@ M54455EVB_i66_config :	unconfig
 	M54455EVB_a66_config)		FLASH=ATMEL; FREQ=66666666;; \
 	M54455EVB_i33_config)		FLASH=INTEL; FREQ=33333333;; \
 	M54455EVB_i66_config)		FLASH=INTEL; FREQ=66666666;; \
+	M54455EVB_stm33_config)		FLASH=STMICRO; FREQ=33333333;; \
 	esac; \
 	if [ "$${FLASH}" = "INTEL" ] ; then \
-		echo "#undef CFG_ATMEL_BOOT" >> $(obj)include/config.h ; \
+		echo "#define CFG_INTEL_BOOT" >> $(obj)include/config.h ; \
 		echo "TEXT_BASE = 0x00000000" > $(obj)board/freescale/m54455evb/config.tmp ; \
 		cp $(obj)board/freescale/m54455evb/u-boot.int $(obj)board/freescale/m54455evb/u-boot.lds ; \
 		$(XECHO) "... with INTEL boot..." ; \
-	else \
+	fi; \
+	if [ "$${FLASH}" = "ATMEL" ] ; then \
 		echo "#define CFG_ATMEL_BOOT"	>> $(obj)include/config.h ; \
 		echo "TEXT_BASE = 0x04000000" > $(obj)board/freescale/m54455evb/config.tmp ; \
 		cp $(obj)board/freescale/m54455evb/u-boot.atm $(obj)board/freescale/m54455evb/u-boot.lds ; \
 		$(XECHO) "... with ATMEL boot..." ; \
+	fi; \
+	if [ "$${FLASH}" = "STMICRO" ] ; then \
+		echo "#define CONFIG_CF_SBF"	>> $(obj)include/config.h ; \
+		echo "#define CFG_STMICRO_BOOT"	>> $(obj)include/config.h ; \
+		echo "TEXT_BASE = 0x4FE00000" > $(obj)board/freescale/m54455evb/config.tmp ; \
+		cp $(obj)board/freescale/m54455evb/u-boot.stm $(obj)board/freescale/m54455evb/u-boot.lds ; \
+		$(XECHO) "... with ST Micro boot..." ; \
 	fi; \
 	echo "#define CFG_INPUT_CLKSRC $${FREQ}" >> $(obj)include/config.h ; \
 	$(XECHO) "... with $${FREQ}Hz input clock"
@@ -1996,8 +2050,11 @@ TASREG_config :		unconfig
 #########################################################################
 
 MPC8313ERDB_33_config \
-MPC8313ERDB_66_config: unconfig
+MPC8313ERDB_66_config \
+MPC8313ERDB_NAND_33_config \
+MPC8313ERDB_NAND_66_config: unconfig
 	@mkdir -p $(obj)include
+	@mkdir -p $(obj)board/freescale/mpc8313erdb
 	@if [ "$(findstring _33_,$@)" ] ; then \
 		$(XECHO) -n "...33M ..." ; \
 		echo "#define CFG_33MHZ" >>$(obj)include/config.h ; \
@@ -2005,6 +2062,11 @@ MPC8313ERDB_66_config: unconfig
 	if [ "$(findstring _66_,$@)" ] ; then \
 		$(XECHO) -n "...66M..." ; \
 		echo "#define CFG_66MHZ" >>$(obj)include/config.h ; \
+	fi ; \
+	if [ "$(findstring _NAND_,$@)" ] ; then \
+		$(XECHO) -n "...NAND..." ; \
+		echo "TEXT_BASE = 0x00100000" > $(obj)/board/freescale/mpc8313erdb/config.tmp ; \
+		echo "#define CONFIG_NAND_U_BOOT" >>$(obj)include/config.h ; \
 	fi ;
 	@$(MKCONFIG) -a MPC8313ERDB ppc mpc83xx mpc8313erdb freescale
 
@@ -2354,13 +2416,13 @@ at91rm9200dk_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm920t at91rm9200dk atmel at91rm9200
 
 at91sam9261ek_config	:	unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9261ek atmel at91sam9
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9261ek atmel at91
 
 at91sam9263ek_config	:	unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9263ek atmel at91sam9
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9263ek atmel at91
 
 at91sam9rlek_config	:	unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9rlek atmel at91sam9
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9rlek atmel at91
 
 cmc_pu2_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm920t cmc_pu2 NULL at91rm9200
@@ -2382,10 +2444,10 @@ mp2usb_config	:	unconfig
 #########################################################################
 
 at91cap9adk_config	:	unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91cap9adk atmel at91sam9
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91cap9adk atmel at91
 
 at91sam9260ek_config	:	unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9260ek atmel at91sam9
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs at91sam9260ek atmel at91
 
 ########################################################################
 ## ARM Integrator boards - see doc/README-integrator for more info.
@@ -2579,6 +2641,18 @@ SMN42_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm720t SMN42 siemens lpc2292
 
 #########################################################################
+## ARM CORTEX Systems
+#########################################################################
+omap3_beagle_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm omap3 beagle omap3
+
+omap3_overo_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm omap3 overo omap3
+
+omap3_evm_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm omap3 evm omap3
+
+#########################################################################
 ## XScale Systems
 #########################################################################
 
@@ -2672,7 +2746,7 @@ imx31_phycore_config	: unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm1136 imx31_phycore NULL mx31
 
 mx31ads_config		: unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm1136 mx31ads NULL mx31
+	@$(MKCONFIG) $(@:_config=) arm arm1136 mx31ads freescale mx31
 
 omap2420h4_config	: unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm1136 omap2420h4 NULL omap24xx
@@ -2911,6 +2985,15 @@ atstk1004_config	:	unconfig
 atstk1006_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) avr32 at32ap atstk1000 atmel at32ap700x
 
+favr-32-ezkit_config	:	unconfig
+	@$(MKCONFIG) $(@:_config=) avr32 at32ap favr-32-ezkit earthlcd at32ap700x
+
+hammerhead_config	:	unconfig
+	@$(MKCONFIG) $(@:_config=) avr32 at32ap hammerhead miromico at32ap700x
+
+mimc200_config		:	unconfig
+	@$(MKCONFIG) $(@:_config=) avr32 at32ap mimc200 mimc at32ap700x
+
 #========================================================================
 # SH3 (SuperH)
 #========================================================================
@@ -3041,9 +3124,9 @@ clobber:	clean
 	@rm -f $(obj)tools/{fdt_wip.c,libfdt_internal.h}
 	@rm -f $(obj)cpu/mpc824x/bedbug_603e.c
 	@rm -f $(obj)include/asm/proc $(obj)include/asm/arch $(obj)include/asm
-	@[ ! -d $(obj)nand_spl ] || find $(obj)nand_spl -lname "*" -print | xargs rm -f
-	@[ ! -d $(obj)onenand_ipl ] || find $(obj)onenand_ipl -lname "*" -print | xargs rm -f
-	@[ ! -d $(obj)api_examples ] || find $(obj)api_examples -lname "*" -print | xargs rm -f
+	@[ ! -d $(obj)nand_spl ] || find $(obj)nand_spl -name "*" -type l -print | xargs rm -f
+	@[ ! -d $(obj)onenand_ipl ] || find $(obj)onenand_ipl -name "*" -type l -print | xargs rm -f
+	@[ ! -d $(obj)api_examples ] || find $(obj)api_examples -name "*" -type l -print | xargs rm -f
 
 ifeq ($(OBJTREE),$(SRCTREE))
 mrproper \
