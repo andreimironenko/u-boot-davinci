@@ -42,6 +42,7 @@
 #define CONFIG_OMAP		1	/* in a TI OMAP core */
 #define CONFIG_OMAP34XX		1	/* which is a 34XX */
 #define CONFIG_OMAP3430		1	/* which is in a 3430 */
+#define CONFIG_OMAP3_EVM	1	/* working with EVM */
 #define CONFIG_DOS_PARTITION	1
 
 #include <asm/arch/cpu.h>	/* get chip and board defs */
@@ -254,7 +255,7 @@
 #define CFG_MONITOR_BASE	CFG_FLASH_BASE	/* Monitor at start of flash */
 #define CFG_ONENAND_BASE	ONENAND_MAP
 
-#define CFG_ENV_IS_IN_ONENAND	1
+#define CFG_ENV_IS_IN_NAND	1
 #define ONENAND_ENV_OFFSET	0x240000	/* environment starts here  */
 #define SMNAND_ENV_OFFSET	0x240000	/* environment starts here  */
 
