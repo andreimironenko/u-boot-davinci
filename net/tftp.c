@@ -72,7 +72,7 @@ extern flash_info_t flash_info[];
  * Minus eth.hdrs thats 1468.  Can get 2x better throughput with
  * almost-MTU block sizes.  At least try... fall back to 512 if need be.
  */
-#define TFTP_MTU_BLOCKSIZE 1468
+#define TFTP_MTU_BLOCKSIZE 512
 static unsigned short TftpBlkSize=TFTP_BLOCK_SIZE;
 static unsigned short TftpBlkSizeOption=TFTP_MTU_BLOCKSIZE;
 

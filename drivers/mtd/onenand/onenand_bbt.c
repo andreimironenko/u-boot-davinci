@@ -68,7 +68,7 @@ static int create_bbt(struct mtd_info *mtd, uint8_t * buf,
 	int startblock;
 	loff_t from;
 	size_t readlen, ooblen;
-	struct mtd_oob_ops ops;
+	struct mtd_oob_ops oob_ops;
 
 	printk(KERN_INFO "Scanning device for bad blocks\n");
 
@@ -86,26 +86,28 @@ static int create_bbt(struct mtd_info *mtd, uint8_t * buf,
 	startblock = 0;
 	from = 0;
 
-	ops.mode = MTD_OOB_PLACE;
-	ops.ooblen = readlen;
-	ops.oobbuf = buf;
-	ops.len = ops.ooboffs = ops.retlen = ops.oobretlen = 0;
-
 	for (i = startblock; i < numblocks;) {
 		int ret;
 
 		for (j = 0; j < len; j++) {
 			/* No need to read pages fully,
 			 * just read required OOB bytes */
-			ret = onenand_bbt_read_oob(mtd,
+			oob_ops.mode = MTD_OOB_AUTO;
+			oob_ops.len = readlen;
+			oob_ops.ooblen = readlen;
+			oob_ops.datbuf = NULL;
+			oob_ops.oobbuf = &buf[0];
+
+			ret = onenand_read_oob(mtd,
 					     from + j * mtd->writesize +
-					     bd->offs, &ops);
+					     bd->offs, &oob_ops);
 
-			/* If it is a initial bad block, just ignore it */
-                        if (ret == ONENAND_BBT_READ_FATAL_ERROR)
-                                return -EIO;
+			if (ret && ret != -EAGAIN) {
+				printk(KERN_WARNING "ret = %d\n", ret);
+				return ret;
+			}
 
-			if (ret || check_short_pattern
+			if (check_short_pattern
 			    (&buf[j * scanlen], scanlen, mtd->writesize, bd)) {
 				bbm->bbt[i >> 3] |= 0x03 << (i & 0x6);
 				printk(KERN_WARNING

@@ -68,8 +68,6 @@ int board_init(void)
 int misc_init_r(void)
 {
 
-	unsigned char byte;
-
 #ifdef CONFIG_DRIVER_OMAP34XX_I2C
 	i2c_init(CFG_I2C_SPEED, CFG_I2C_SLAVE);
 #endif
@@ -89,7 +87,7 @@ int misc_init_r(void)
  *****************************************************************************/
 void set_muxconf_regs(void)
 {
-	MUX_DEFAULT_ES2();
+	MUX_DEFAULT_EVM();
 }
 
 /******************************************************************************

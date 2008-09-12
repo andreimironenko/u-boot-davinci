@@ -565,7 +565,6 @@ restart:
 				sprintf(buf, "%lX", (unsigned long)load_addr);
 				setenv("fileaddr", buf);
 			}
-			eth_halt();
 			return NetBootFileXferSize;
 
 		case NETLOOP_FAIL:
