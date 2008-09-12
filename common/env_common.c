@@ -46,8 +46,13 @@ DECLARE_GLOBAL_DATA_PTR;
 
 extern env_t *env_ptr;
 
-extern void env_relocate_spec (void);
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+extern env_get_char_spec_p env_get_char_spec;
+extern env_relocate_spec_p env_relocate_spec;
+#else
 extern uchar env_get_char_spec(int);
+extern void env_relocate_spec(void);
+#endif
 
 static uchar env_get_char_init (int index);
 
@@ -134,7 +139,8 @@ uchar default_environment[] = {
 };
 
 #if defined(CFG_ENV_IS_IN_NAND)		/* Environment is in Nand Flash */ \
-	|| defined(CFG_ENV_IS_IN_SPI_FLASH)
+	|| defined(CFG_ENV_IS_IN_SPI_FLASH) || \
+	(defined(CONFIG_CMD_NAND) && defined(CFG_ENV_IS_IN_SEL_RUN))
 int default_environment_size = sizeof(default_environment);
 #endif
 
@@ -191,7 +197,6 @@ uchar env_get_char (int index)
 		c = env_get_char_memory(index);
 	else
 		c = env_get_char_init(index);
-
 	return (c);
 }
 
@@ -258,7 +263,6 @@ void env_relocate (void)
 		env_relocate_spec ();
 	}
 	gd->env_addr = (ulong)&(env_ptr->data);
-
 #ifdef CONFIG_AMIGAONEG3SE
 	disable_nvram();
 #endif

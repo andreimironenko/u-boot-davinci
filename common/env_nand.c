@@ -34,7 +34,9 @@
 
 #include <common.h>
 
-#if defined(CFG_ENV_IS_IN_NAND) /* Environment is in Nand Flash */
+/* Environment is in Nand Flash */
+#if defined(CFG_ENV_IS_IN_NAND) || (defined(CONFIG_CMD_NAND) && \
+					defined(CFG_ENV_IS_IN_SEL_RUN))
 
 #include <command.h>
 #include <environment.h>
@@ -68,12 +70,18 @@ int nand_legacy_rw (struct nand_chip* nand, int cmd,
 extern uchar default_environment[];
 extern int default_environment_size;
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+char *nand_env_name_spec = "NAND";
+#else
 char * env_name_spec = "NAND";
-
+#endif
 
 #ifdef ENV_IS_EMBEDDED
 extern uchar environment[];
 env_t *env_ptr = (env_t *)(&environment[0]);
+#elif defined(CFG_ENV_IS_IN_SEL_RUN)
+env_t *nand_env_ptr;
+extern env_t *env_ptr;
 #else /* ! ENV_IS_EMBEDDED */
 env_t *env_ptr = 0;
 #endif /* ENV_IS_EMBEDDED */
@@ -86,7 +94,11 @@ static void use_default(void);
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+uchar nand_env_get_char_spec(int index)
+#else
 uchar env_get_char_spec (int index)
+#endif
 {
 	return ( *((uchar *)(gd->env_addr + index)) );
 }
@@ -103,7 +115,11 @@ uchar env_get_char_spec (int index)
  * the SPL loads not only the U-Boot image from NAND but also the
  * environment.
  */
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+int nand_env_init(void)
+#else
 int env_init(void)
+#endif
 {
 #if defined(ENV_IS_EMBEDDED)
 	size_t total;
@@ -184,7 +200,11 @@ int writeenv(size_t offset, u_char *buf)
 	return 0;
 }
 #ifdef CFG_ENV_OFFSET_REDUND
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+int nand_saveenv(void)
+#else
 int saveenv(void)
+#endif
 {
 	size_t total;
 	int ret = 0;
@@ -227,7 +247,11 @@ int saveenv(void)
 	return ret;
 }
 #else /* ! CFG_ENV_OFFSET_REDUND */
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+int nand_saveenv(void)
+#else
 int saveenv(void)
+#endif
 {
 	size_t total;
 	int ret = 0;
@@ -287,7 +311,11 @@ int readenv (size_t offset, u_char * buf)
 }
 
 #ifdef CFG_ENV_OFFSET_REDUND
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+void nand_env_relocate_spec(void)
+#else
 void env_relocate_spec (void)
+#endif
 {
 #if !defined(ENV_IS_EMBEDDED)
 	size_t total;
@@ -344,7 +372,11 @@ void env_relocate_spec (void)
  * The legacy NAND code saved the environment in the first NAND device i.e.,
  * nand_dev_desc + 0. This is also the behaviour using the new NAND code.
  */
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+void nand_env_relocate_spec(void)
+#else
 void env_relocate_spec (void)
+#endif
 {
 #if !defined(ENV_IS_EMBEDDED)
 	int ret;

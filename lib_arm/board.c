@@ -58,11 +58,16 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+extern void gpmc_init(void);
+extern void print_board_info(void);
+#endif
 
 #ifdef CONFIG_HAS_DATAFLASH
 extern int  AT91F_DataflashInit(void);
 extern void dataflash_print_info(void);
 #endif
+
 
 #ifndef CONFIG_IDENT_STRING
 #define CONFIG_IDENT_STRING ""
@@ -258,6 +263,7 @@ static int reloc_init(void)
 typedef int (init_fnc_t) (void);
 
 int print_cpuinfo (void); /* test-only */
+extern env_init_p env_init;
 
 init_fnc_t *init_sequence[] = {
 	cpu_init,		/* basic cpu dependent setup */
@@ -268,7 +274,11 @@ init_fnc_t *init_sequence[] = {
 #endif
 	board_init,		/* basic board dependent setup */
 	interrupt_init,		/* set up exceptions */
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+	NULL,			/* initialize environment */
+#else
 	env_init,		/* initialize environment */
+#endif
 	init_baudrate,		/* initialze baudrate settings */
 	serial_init,		/* serial communications setup */
 	console_init_f,		/* stage 1 init of console */
@@ -353,6 +363,11 @@ void start_armboot (void)
 	/* armboot_start is defined in the board-specific linker script */
 	mem_malloc_init (_armboot_start - CFG_MALLOC_LEN);
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+	gpmc_init(); /* in SRAM or SDRAM, finish GPMC */
+	env_init();
+#endif
+
 #if defined(CONFIG_CMD_NAND)
 	puts ("NAND:  ");
 	nand_init();		/* go init the NAND */
@@ -377,6 +392,11 @@ void start_armboot (void)
 
 #ifdef CONFIG_SERIAL_MULTI
 	serial_initialize();
+#endif
+
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+	display_banner();
+	print_board_info();
 #endif
 
 	/* IP Address */

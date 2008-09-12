@@ -310,6 +310,20 @@ void nand_init(void)
 #endif
 
 /******************************************************************************
+ * Routine: print_board_info
+ * Description: Displays cpu and memory information for the board
+ *****************************************************************************/
+void print_board_info(void)
+{
+	u32 mtype, btype;
+
+	btype = get_board_type();
+	mtype = get_mem_type();
+
+	display_board_info(btype);
+}
+
+/******************************************************************************
  * Dummy function to handle errors for EABI incompatibility
  *****************************************************************************/
 void raise(void)
@@ -322,3 +336,5 @@ void raise(void)
 void abort(void)
 {
 }
+
+

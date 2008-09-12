@@ -255,7 +255,6 @@
 #define CFG_MONITOR_BASE	CFG_FLASH_BASE	/* Monitor at start of flash */
 #define CFG_ONENAND_BASE	ONENAND_MAP
 
-#define CFG_ENV_IS_IN_NAND	1
 #define ONENAND_ENV_OFFSET	0x240000	/* environment starts here  */
 #define SMNAND_ENV_OFFSET	0x240000	/* environment starts here  */
 
@@ -276,7 +275,7 @@
 #define CFG_JFFS2_FIRST_BANK	CFG_MAX_FLASH_BANKS	/* use flash_info[2] */
 #define CFG_JFFS2_NUM_BANKS	1
 
-#define ENV_IS_VARIABLE		1
+#define CFG_ENV_IS_IN_SEL_RUN	1               /* Sel NAND/OneNAND on fly  */
 
 #ifndef __ASSEMBLY__
 extern unsigned int nand_cs_base;

@@ -69,7 +69,8 @@
 # endif
 #endif	/* CFG_ENV_IS_IN_FLASH */
 
-#if defined(CFG_ENV_IS_IN_NAND)
+#if defined(CFG_ENV_IS_IN_NAND) || \
+	(defined(CONFIG_CMD_NAND) && defined(CFG_ENV_IS_IN_SEL_RUN))
 # ifndef CFG_ENV_OFFSET
 #  error "Need to define CFG_ENV_OFFSET when using CFG_ENV_IS_IN_NAND"
 # endif

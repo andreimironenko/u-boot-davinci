@@ -34,16 +34,21 @@
 
 extern omap3_sysinfo sysinfo;
 
+#if defined(CONFIG_CMD_ONENAND)
+extern u8 is_onenand;
+#endif
+
 /**************************************************************************
  * get_gpmc0_type()
  ***************************************************************************/
 u32 get_gpmc0_type(void)
 {
-#if defined(CFG_ENV_IS_IN_ONENAND)
-	return 1; /* OneNAND */
-#else
-	return 2; /* NAND */
+#if defined(CONFIG_CMD_ONENAND)
+	if (is_onenand)
+		return 1; /* OneNAND */
+	else
 #endif
+		return 2; /* NAND */
 }
 
 /****************************************************

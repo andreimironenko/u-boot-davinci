@@ -23,7 +23,9 @@
 
 #include <common.h>
 
-#if defined(CFG_ENV_IS_IN_ONENAND)	/* Environment is in OneNAND */
+/* Environment is in OneNAND */
+#if defined(CFG_ENV_IS_IN_ONENAND) || (defined(CONFIG_CMD_ONENAND) && \
+					defined(CFG_ENV_IS_IN_SEL_RUN))
 
 #include <command.h>
 #include <environment.h>
@@ -42,11 +44,19 @@ extern uchar default_environment[];
 
 #define ONENAND_ENV_SIZE(mtd)	(mtd.writesize - ENV_HEADER_SIZE)
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+char *onenand_env_name_spec = "OneNAND";
+#else
 char *env_name_spec = "OneNAND";
+#endif
 
 #ifdef ENV_IS_EMBEDDED
 extern uchar environment[];
 env_t *env_ptr = (env_t *) (&environment[0]);
+#elif defined(CFG_ENV_IS_IN_SEL_RUN)
+static unsigned char onenand_env[MAX_ONENAND_PAGESIZE];
+env_t *onenand_env_ptr = (env_t *)&onenand_env[0];
+extern env_t *env_ptr;
 #else /* ! ENV_IS_EMBEDDED */
 static unsigned char onenand_env[MAX_ONENAND_PAGESIZE];
 env_t *env_ptr = (env_t *) onenand_env;
@@ -54,12 +64,20 @@ env_t *env_ptr = (env_t *) onenand_env;
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+uchar onenand_env_get_char_spec(int index)
+#else
 uchar env_get_char_spec(int index)
+#endif
 {
 	return (*((uchar *) (gd->env_addr + index)));
 }
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+void onenand_env_relocate_spec(void)
+#else
 void env_relocate_spec(void)
+#endif
 {
 	unsigned long env_addr;
 	int use_default = 0;
@@ -90,7 +108,11 @@ void env_relocate_spec(void)
 	gd->env_valid = 1;
 }
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+int onenand_saveenv(void)
+#else
 int saveenv(void)
+#endif
 {
 	unsigned long env_addr = CFG_ENV_ADDR;
 	struct erase_info instr = {
@@ -118,7 +140,11 @@ int saveenv(void)
 	return 0;
 }
 
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+int onenand_env_init(void)
+#else
 int env_init(void)
+#endif
 {
 	/* use default */
 	gd->env_addr = (ulong) & default_environment[0];

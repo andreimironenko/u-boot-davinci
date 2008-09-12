@@ -26,11 +26,13 @@
  */
 
 #include <common.h>
+#include <environment.h>
 #include <asm/io.h>
 #include <asm/arch/bits.h>
 #include <asm/arch/mem.h>
 #include <asm/arch/sys_proto.h>
 #include <command.h>
+#include <nand.h>
 
 /* Only One NAND allowed on board at a time.
  * The GPMC CS Base for the same
@@ -40,33 +42,42 @@ unsigned int boot_flash_off;
 unsigned int boot_flash_sec;
 unsigned int boot_flash_type;
 volatile unsigned int boot_flash_env_addr;
+char *env_name_spec;
+env_t *env_ptr;
+extern char *nand_env_name_spec;
+extern char *onenand_env_name_spec;
+extern env_t *nand_env_ptr;
+extern env_t *onenand_env_ptr;
+
+/* if 1 = NAND, 2 = ONENAND */
+unsigned int env_in_storage;
+extern void onenand_init(void);
+extern int nand_scan_ident(struct mtd_info *mtd, int maxchips);
 
 /* help common/env_flash.c */
-#ifdef ENV_IS_VARIABLE
-
-uchar(*boot_env_get_char_spec) (int index);
-int (*boot_env_init) (void);
-int (*boot_saveenv) (void);
-void (*boot_env_relocate_spec) (void);
-
-/* 16 bit NAND */
+#if defined(CFG_ENV_IS_IN_SEL_RUN)
+env_get_char_spec_p env_get_char_spec;
+env_init_p env_init;
+saveenv_p saveenv;
+env_relocate_spec_p env_relocate_spec;
+extern uchar nand_env_get_char_spec(int index);
+extern int nand_env_init(void);
+extern int nand_saveenv(void);
+extern void nand_env_relocate_spec(void);
+extern uchar onenand_env_get_char_spec(int index);
+extern int onenand_env_init(void);
+extern int onenand_saveenv(void);
+extern void onenand_env_relocate_spec(void);
+#else
 uchar env_get_char_spec(int index);
 int env_init(void);
 int saveenv(void);
 void env_relocate_spec(void);
-extern char *env_name_spec;
+#endif
 
 #if defined(CONFIG_CMD_NAND)
 u8 is_nand;
-#endif
-
-#if defined(CONFIG_CMD_ONENAND)
-u8 is_onenand;
-#endif
-
-#endif /* ENV_IS_VARIABLE */
-
-#if defined(CONFIG_CMD_NAND)
+extern nand_info_t nand_info[CFG_MAX_NAND_DEVICE];
 static u32 gpmc_m_nand[GPMC_MAX_REG] = {
 	M_NAND_GPMC_CONFIG1,
 	M_NAND_GPMC_CONFIG2,
@@ -79,6 +90,8 @@ unsigned int nand_cs_base;
 #endif
 
 #if defined(CONFIG_CMD_ONENAND)
+u8 is_onenand;
+extern struct mtd_info onenand_mtd;
 static u32 gpmc_onenand[GPMC_MAX_REG] = {
 	ONENAND_GPMC_CONFIG1,
 	ONENAND_GPMC_CONFIG2,
@@ -223,6 +236,7 @@ void gpmc_init(void)
 	u32 mux = 0, mwidth;
 	u32 *gpmc_config = NULL;
 	u32 gpmc_base = 0;
+	u32 gpmc_index = 0;
 	u32 base = 0;
 	u32 size = 0;
 	u32 f_off = CFG_MONITOR_LEN;
@@ -248,40 +262,46 @@ void gpmc_init(void)
 
 #if defined(CONFIG_CMD_NAND)    /* CS 0 */
 	gpmc_config = gpmc_m_nand;
-#if defined(CFG_ENV_IS_IN_NAND)
-	gpmc_base = GPMC_CONFIG_CS0 + (0 * GPMC_CONFIG_WIDTH);
-#else
-	gpmc_base = GPMC_CONFIG_CS0 + (1 * GPMC_CONFIG_WIDTH);
-#endif
+	gpmc_base = GPMC_CONFIG_CS0 + (gpmc_index * GPMC_CONFIG_WIDTH);
 	base = PISMO1_NAND_BASE;
 	size = PISMO1_NAND_SIZE;
 	enable_gpmc_config(gpmc_config, gpmc_base, base, size);
-	is_nand = 1;
-	nand_cs_base = gpmc_base;
-#if defined(CFG_ENV_IS_IN_NAND)
-	f_off = SMNAND_ENV_OFFSET;
-	f_sec = SZ_128K;
-	/* env setup */
-	boot_flash_base = base;
-	boot_flash_off = f_off;
-	boot_flash_sec = f_sec;
-	boot_flash_env_addr = f_off;
-#endif
+	/* NAND and/or ONENAND is to be scanned */
+	is_nand = 0;
+	nand_init();
+	if (nand_info[0].size) {
+		is_nand = 1;
+		nand_cs_base = gpmc_base;
+		f_off = SMNAND_ENV_OFFSET;
+		f_sec = SZ_128K;
+		/* env setup */
+		boot_flash_base = base;
+		boot_flash_off = f_off;
+		boot_flash_sec = f_sec;
+		boot_flash_env_addr = f_off;
+
+		env_name_spec = nand_env_name_spec;
+		env_ptr = nand_env_ptr;
+		env_get_char_spec = nand_env_get_char_spec;
+		env_init = nand_env_init;
+		saveenv = nand_saveenv;
+		env_relocate_spec = nand_env_relocate_spec;
+		gpmc_index++;
+	}
 #endif
 
 #if defined(CONFIG_CMD_ONENAND)
 	gpmc_config = gpmc_onenand;
-#if defined(CFG_ENV_IS_IN_ONENAND)
-	gpmc_base = GPMC_CONFIG_CS0 + (0 * GPMC_CONFIG_WIDTH);
-#else
-	gpmc_base = GPMC_CONFIG_CS0 + (1 * GPMC_CONFIG_WIDTH);
-#endif
+	gpmc_base = GPMC_CONFIG_CS0 + (gpmc_index * GPMC_CONFIG_WIDTH);
 	base = PISMO1_ONEN_BASE;
 	size = PISMO1_ONEN_SIZE;
 	enable_gpmc_config(gpmc_config, gpmc_base, base, size);
+	/* NAND and/or ONENAND is to be scanned */
+	is_onenand = 0;
+	onenand_init();
+	if (onenand_mtd.size) {
 	is_onenand = 1;
 	onenand_cs_base = gpmc_base;
-#if defined(CFG_ENV_IS_IN_ONENAND)
 	f_off = ONENAND_ENV_OFFSET;
 	f_sec = SZ_128K;
 	/* env setup */
@@ -289,13 +309,13 @@ void gpmc_init(void)
 	boot_flash_off = f_off;
 	boot_flash_sec = f_sec;
 	boot_flash_env_addr = f_off;
-#endif
+	env_name_spec = onenand_env_name_spec;
+	env_ptr = onenand_env_ptr;
+	env_get_char_spec = onenand_env_get_char_spec;
+	env_init = onenand_env_init;
+	saveenv = onenand_saveenv;
+	env_relocate_spec = onenand_env_relocate_spec;
+	}
 #endif
 
-#ifdef ENV_IS_VARIABLE
-	boot_env_get_char_spec = env_get_char_spec;
-	boot_env_init = env_init;
-	boot_saveenv = saveenv;
-	boot_env_relocate_spec = env_relocate_spec;
-#endif
 }
