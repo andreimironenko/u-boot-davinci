@@ -366,6 +366,11 @@ void start_armboot (void)
 #if defined(CFG_ENV_IS_IN_SEL_RUN)
 	gpmc_init(); /* in SRAM or SDRAM, finish GPMC */
 	env_init();
+	init_baudrate();        /* initialze baudrate settings */
+	serial_init();          /* serial communications setup */
+	console_init_f();       /* stage 1 init of console */
+	display_banner();
+	print_board_info();
 #endif
 
 #if defined(CONFIG_CMD_NAND)
@@ -392,11 +397,6 @@ void start_armboot (void)
 
 #ifdef CONFIG_SERIAL_MULTI
 	serial_initialize();
-#endif
-
-#if defined(CFG_ENV_IS_IN_SEL_RUN)
-	display_banner();
-	print_board_info();
 #endif
 
 	/* IP Address */
