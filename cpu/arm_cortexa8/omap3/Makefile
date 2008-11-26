@@ -26,7 +26,7 @@ include $(TOPDIR)/config.mk
 LIB	=  $(obj)lib$(SOC).a
 
 SOBJS	:= lowlevel_init.o
-COBJS	:= sys_info.o
+COBJS	:= sys_info.o board.o clock.o interrupts.o
 
 SRCS	:= $(SOBJS:.o=.S) $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS) $(SOBJS))
