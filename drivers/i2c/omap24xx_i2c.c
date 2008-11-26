@@ -27,15 +27,15 @@
 
 static void wait_for_bb (void);
 static u16 wait_for_pin (void);
-static void flush_fifo(void);
+static void flush_fifo (void);
 
 void i2c_init (int speed, int slaveadd)
 {
 	u16 scl;
 
-	writew(0x2, I2C_SYSC); /* for ES2 after soft reset */
-	udelay(1000);
-	writew(0x0, I2C_SYSC); /* will probably self clear but */
+	writew (0x2, I2C_SYSC); /* for ES2 after soft reset */
+	udelay (1000);
+	writew (0x0, I2C_SYSC); /* will probably self clear but */
 
 	if (readw (I2C_CON) & I2C_CON_EN) {
 		writew (0, I2C_CON);
@@ -44,8 +44,8 @@ void i2c_init (int speed, int slaveadd)
 
 	/* 12MHz I2C module clock */
 	writew (0, I2C_PSC);
-	speed = speed/1000;		    /* 100 or 400 */
-	scl = ((12000/(speed*2)) - 7);	/* use 7 when PSC = 0 */
+	speed = speed / 1000;			/* 100 or 400 */
+	scl = ((12000 / (speed * 2)) - 7);	/* use 7 when PSC = 0 */
 	writew (scl, I2C_SCLL);
 	writew (scl, I2C_SCLH);
 	/* own address */
@@ -56,7 +56,7 @@ void i2c_init (int speed, int slaveadd)
 	writew (I2C_IE_XRDY_IE | I2C_IE_RRDY_IE | I2C_IE_ARDY_IE |
 		I2C_IE_NACK_IE | I2C_IE_AL_IE, I2C_IE);
 	udelay (1000);
-	flush_fifo();
+	flush_fifo ();
 	writew (0xFFFF, I2C_STAT);
 	writew (0, I2C_CNT);
 }
@@ -124,7 +124,7 @@ static int i2c_read_byte (u8 devaddr, u8 regoffset, u8 * value)
 			}
 		}
 	}
-	flush_fifo();
+	flush_fifo ();
 	writew (0xFFFF, I2C_STAT);
 	writew (0, I2C_CNT);
 	return i2c_error;
@@ -165,7 +165,8 @@ static int i2c_write_byte (u8 devaddr, u8 regoffset, u8 value)
 		int eout = 200;
 
 		writew (I2C_CON_EN, I2C_CON);
-		while ((stat = readw (I2C_STAT)) || (readw (I2C_CON) & I2C_CON_MST)) {
+		while ((stat = readw (I2C_STAT))
+			|| (readw (I2C_CON) & I2C_CON_MST)) {
 			udelay (1000);
 			/* have to read to clear intrrupt */
 			writew (0xFFFF, I2C_STAT);
@@ -173,7 +174,7 @@ static int i2c_write_byte (u8 devaddr, u8 regoffset, u8 value)
 				break;
 		}
 	}
-	flush_fifo();
+	flush_fifo ();
 	writew (0xFFFF, I2C_STAT);
 	writew (0, I2C_CNT);
 	return i2c_error;
@@ -185,14 +186,15 @@ static void flush_fifo(void)
 	/* note: if you try and read data when its not there or ready
 	 * you get a bus error
 	 */
-	while(1){
-		stat = readw(I2C_STAT);
-		if(stat == I2C_STAT_RRDY){
-			readw(I2C_DATA);
-			writew(I2C_STAT_RRDY,I2C_STAT);
-			udelay(1000);
-		}else
-			break;
+	while(1) {
+		stat = readw (I2C_STAT);
+		if (stat == I2C_STAT_RRDY) {
+			readw (I2C_DATA);
+			writew (I2C_STAT_RRDY,I2C_STAT);
+			udelay (1000);
+		} else {
+			return;
+		}
 	}
 }
 
@@ -217,18 +219,18 @@ int i2c_probe (uchar chip)
 	udelay (50000);
 
 	if (!(readw (I2C_STAT) & I2C_STAT_NACK)) {
-		res = 0;      /* success case */
-		flush_fifo();
-		writew(0xFFFF, I2C_STAT);
+		res = 0;			/* success case */
+		flush_fifo ();
+		writew (0xFFFF, I2C_STAT);
 	} else {
-		writew(0xFFFF, I2C_STAT);	 /* failue, clear sources*/
+		writew (0xFFFF, I2C_STAT);	 /* failue, clear sources*/
 		writew (readw (I2C_CON) | I2C_CON_STP, I2C_CON); /* finish up xfer */
-		udelay(20000);
+		udelay (20000);
 		wait_for_bb ();
 	}
-	flush_fifo();
+	flush_fifo ();
 	writew (0, I2C_CNT); /* don't allow any more data in...we don't want it.*/
-	writew(0xFFFF, I2C_STAT);
+	writew (0xFFFF, I2C_STAT);
 	return res;
 }
 
@@ -287,7 +289,7 @@ static void wait_for_bb (void)
 	int timeout = 10;
 	u16 stat;
 
-	writew(0xFFFF, I2C_STAT);	 /* clear current interruts...*/
+	writew (0xFFFF, I2C_STAT);	 /* clear current interruts...*/
 	while ((stat = readw (I2C_STAT) & I2C_STAT_BB) && timeout--) {
 		writew (stat, I2C_STAT);
 		udelay (50000);
@@ -297,7 +299,7 @@ static void wait_for_bb (void)
 		printf ("timed out in wait_for_bb: I2C_STAT=%x\n",
 			readw (I2C_STAT));
 	}
-	writew(0xFFFF, I2C_STAT);	 /* clear delayed stuff*/
+	writew (0xFFFF, I2C_STAT);	 /* clear delayed stuff*/
 }
 
 static u16 wait_for_pin (void)
@@ -308,7 +310,7 @@ static u16 wait_for_pin (void)
 	do {
 		udelay (1000);
 		status = readw (I2C_STAT);
-	} while (  !(status &
+	} while (!(status &
 		   (I2C_STAT_ROVR | I2C_STAT_XUDF | I2C_STAT_XRDY |
 		    I2C_STAT_RRDY | I2C_STAT_ARDY | I2C_STAT_NACK |
 		    I2C_STAT_AL)) && timeout--);
@@ -316,7 +318,7 @@ static u16 wait_for_pin (void)
 	if (timeout <= 0) {
 		printf ("timed out in wait_for_pin: I2C_STAT=%x\n",
 			readw (I2C_STAT));
-			writew(0xFFFF, I2C_STAT);
-}
+			writew (0xFFFF, I2C_STAT);
+	}
 	return status;
 }
