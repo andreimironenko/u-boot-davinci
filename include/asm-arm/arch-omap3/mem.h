@@ -197,6 +197,14 @@ typedef enum {
 #define ONENAND_GPMC_CONFIG5	0x010F1010
 #define ONENAND_GPMC_CONFIG6	0x1F060000
 
+#define NET_GPMC_CONFIG1	0x00001000
+#define NET_GPMC_CONFIG2	0x001e1e01
+#define NET_GPMC_CONFIG3	0x00080300
+#define NET_GPMC_CONFIG4	0x1c091c09
+#define NET_GPMC_CONFIG5	0x04181f1f
+#define NET_GPMC_CONFIG6	0x00000FCF
+#define NET_GPMC_CONFIG7	0x00000f6c
+
 /* max number of GPMC Chip Selects */
 #define GPMC_MAX_CS	8
 /* max number of GPMC regs */

@@ -86,6 +86,7 @@
 #define OMAP34XX_GPIO6_BASE		0x49058000
 
 #define GPIO_OE				0x34
+#define GPIO_CLEARDATAOUT		0x90
 #define GPIO_SETDATAOUT			0x94
 
 #define GPIO0				(0x1 << 0)
