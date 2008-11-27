@@ -477,6 +477,10 @@ Rowel Atienza <rowel@diwalabs.com>
 
 	armadillo	ARM720T
 
+Dirk Behme <dirk.behme@gmail.com>
+
+	omap3_beagle	ARM CORTEX-A8 (OMAP3xx SoC)
+
 Rishi Bhattacharya <rishi@ti.com>
 
 	omap5912osk	ARM926EJS

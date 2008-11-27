@@ -506,6 +506,7 @@ LIST_ARM9="			\
 	davinci_schmoogie	\
 	davinci_sffsdr		\
 	davinci_sonata		\
+	omap3_beagle		\
 "
 
 #########################################################################
