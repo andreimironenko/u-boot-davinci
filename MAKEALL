@@ -507,6 +507,7 @@ LIST_ARM9="			\
 	davinci_sffsdr		\
 	davinci_sonata		\
 	omap3_beagle		\
+	omap3_evm		\
 "
 
 #########################################################################
