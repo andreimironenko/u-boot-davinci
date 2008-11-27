@@ -26,8 +26,14 @@
 const omap3_sysinfo sysinfo = {
 	OMAP3EVM_V1,
 	OMAP3EVM_V2,
+	DDR_DISCRETE,
 	"35X-Family",
 	"OMAP3 EVM board",
+#if defined(CONFIG_ENV_IS_IN_ONENAND)
+	"OneNAND",
+#else
+	"NAND",
+#endif
 };
 
 static int setup_net_chip(void);

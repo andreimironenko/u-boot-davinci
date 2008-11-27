@@ -24,8 +24,10 @@
 typedef struct {
 	u32 board_type_v1;
 	u32 board_type_v2;
+	u32 mtype;
 	char *cpu_string;
 	char *board_string;
+	char *nand_string;
 } omap3_sysinfo;
 
 void prcm_init(void);
@@ -39,11 +41,9 @@ void gpmc_init(void);
 void watchdog_init(void);
 void set_muxconf_regs(void);
 
-u32 get_cpu_type(void);
 u32 get_cpu_rev(void);
 u32 get_mem_type(void);
 u32 get_sysboot_value(void);
-u32 get_gpmc0_base(void);
 u32 is_gpmc_muxed(void);
 u32 get_gpmc0_type(void);
 u32 get_gpmc0_width(void);

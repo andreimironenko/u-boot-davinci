@@ -26,8 +26,14 @@
 const omap3_sysinfo sysinfo = {
 	SDP_3430_V1,
 	SDP_3430_V2,
+	DDR_STACKED,
 	"3530",
 	"OMAP3 Beagle board",
+#if defined(CONFIG_ENV_IS_IN_ONENAND)
+	"OneNAND",
+#else
+	"NAND",
+#endif
 };
 
 /*

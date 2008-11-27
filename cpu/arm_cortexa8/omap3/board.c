@@ -45,6 +45,8 @@
 #define UNLOCK_2 0x00000000
 #define UNLOCK_3 0x0000FFFF
 
+extern omap3_sysinfo sysinfo;
+
 /******************************************************************************
  * Routine: delay
  * Description: spinning delay to use before udelay works
@@ -254,10 +256,9 @@ int dram_init(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
 	unsigned int size0 = 0, size1 = 0;
-	u32 mtype, btype;
+	u32 btype;
 
 	btype = get_board_type();
-	mtype = get_mem_type();
 
 	display_board_info(btype);
 
@@ -265,7 +266,7 @@ int dram_init(void)
 	 * where it can be started.  Early init code will init
 	 * memory on CS0.
 	 */
-	if ((mtype == DDR_COMBO) || (mtype == DDR_STACKED)) {
+	if ((sysinfo.mtype == DDR_COMBO) || (sysinfo.mtype == DDR_STACKED)) {
 		do_sdrc_init(SDRC_CS1_OSET, NOT_EARLY);
 		make_cs1_contiguous();
 	}

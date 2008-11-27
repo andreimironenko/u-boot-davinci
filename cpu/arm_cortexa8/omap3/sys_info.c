@@ -35,28 +35,6 @@
 extern omap3_sysinfo sysinfo;
 static u32 *gpmc_base = (u32 *)GPMC_BASE;
 
-/**************************************************************************
- * get_gpmc0_type()
- ***************************************************************************/
-u32 get_gpmc0_type(void)
-{
-#if defined(CONFIG_ENV_IS_IN_ONENAND)
-	return 1; /* OneNAND */
-#else
-	return 2; /* NAND */
-#endif
-}
-
-/****************************************************
- * get_cpu_type() - low level get cpu type
- * - no C globals yet.
- ****************************************************/
-u32 get_cpu_type(void)
-{
-	/* fixme, need to get register defines for OMAP3 */
-	return CPU_3430;
-}
-
 /******************************************
  * get_cpu_rev(void) - extract version info
  ******************************************/
@@ -80,22 +58,9 @@ u32 get_cpu_rev(void)
  ****************************************************/
 u32 is_mem_sdr(void)
 {
-	volatile u32 *burst = (volatile u32 *) (SDRC_MR_0 + SDRC_CS0_OSET);
-	if (*burst == SDP_SDRC_MR_0_SDR)
+	if (readl(SDRC_MR_0 + SDRC_CS0_OSET) == SDP_SDRC_MR_0_SDR)
 		return 1;
 	return 0;
-}
-
-/***********************************************************
- * get_mem_type() - identify type of mDDR part used.
- ***********************************************************/
-u32 get_mem_type(void)
-{
-#if defined(CONFIG_OMAP3_BEAGLE) || defined(CONFIG_OVERO)
-	return DDR_STACKED;
-#else
-	return DDR_DISCRETE;
-#endif
 }
 
 /***********************************************************************
@@ -196,68 +161,34 @@ u32 get_board_rev(void)
  *********************************************************************/
 void display_board_info(u32 btype)
 {
-	char *bootmode[] = {
-		"NOR",
-		"ONENAND",
-		"NAND",
-		"P2a",
-		"NOR",
-		"NOR",
-		"P2a",
-		"P2b",
-	};
-	u32 brev = get_board_rev();
-	char db_ver[] = "0.0";	/* board type */
-	char mem_sdr[] = "mSDR";	/* memory type */
-	char mem_ddr[] = "LPDDR";
-	char t_tst[] = "TST";	/* security level */
-	char t_emu[] = "EMU";
-	char t_hs[] = "HS";
-	char t_gp[] = "GP";
-	char unk[] = "?";
-#ifdef CONFIG_LED_INFO
-	char led_string[CONFIG_LED_LEN] = { 0 };
-#endif
-	char p_l3[] = "165";
-	char p_cpu[] = "2";
-
-	char *db_s, *mem_s, *sec_s;
-	u32 cpu, rev, sec;
-
-	rev = get_cpu_rev();
-	cpu = get_cpu_type();
-	sec = get_device_type();
+	char *mem_s, *sec_s;
 
 	if (is_mem_sdr())
-		mem_s = mem_sdr;
+		mem_s = "mSDR";
 	else
-		mem_s = mem_ddr;
+		mem_s = "LPDDR";
 
-	db_s = db_ver;
-	db_s[0] += (brev >> 4) & 0xF;
-	db_s[2] += brev & 0xF;
-
-	switch (sec) {
+	switch (get_device_type()) {
 	case TST_DEVICE:
-		sec_s = t_tst;
+		sec_s = "TST";
 		break;
 	case EMU_DEVICE:
-		sec_s = t_emu;
+		sec_s = "EMU";
 		break;
 	case HS_DEVICE:
-		sec_s = t_hs;
+		sec_s = "HS";
 		break;
 	case GP_DEVICE:
-		sec_s = t_gp;
+		sec_s = "GP";
 		break;
 	default:
-		sec_s = unk;
+		sec_s = "?";
 	}
 
-	printf("OMAP%s-%s rev %d, CPU-OPP%s L3-%sMHz\n", sysinfo.cpu_string,
-	       sec_s, rev, p_cpu, p_l3);
+	printf("OMAP%s-%s rev %d, CPU-OPP2 L3-165MHz\n", sysinfo.cpu_string,
+	       sec_s, get_cpu_rev());
 	printf("%s + %s/%s\n", sysinfo.board_string,
-	       mem_s, bootmode[get_gpmc0_type()]);
+	       mem_s, sysinfo.nand_string);
 
 }
 
@@ -312,7 +243,7 @@ u32 is_running_in_sdram(void)
 
 /***************************************************************
  *  get_boot_type() - Is this an XIP type device or a stream one
- *  bits 4-0 specify type.  Bit 5 sys mem/perif
+ *  bits 4-0 specify type. Bit 5 says mem/perif
  ***************************************************************/
 u32 get_boot_type(void)
 {
@@ -327,8 +258,5 @@ u32 get_boot_type(void)
  *************************************************************/
 u32 get_device_type(void)
 {
-	int mode;
-
-	mode = readl(CONTROL_STATUS) & (DEVICE_MASK);
-	return mode >>= 8;
+	return ((readl(CONTROL_STATUS) & (DEVICE_MASK)) >> 8);
 }
