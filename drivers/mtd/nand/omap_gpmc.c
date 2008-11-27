@@ -250,12 +250,17 @@ void omap_nand_switch_ecc(int32_t hardware)
 	nand->options = NAND_NO_PADDING | NAND_CACHEPRG | NAND_NO_AUTOINCR |
 			NAND_NO_AUTOINCR;
 
+	/* Reset ecc interface */
+	nand->ecc.read_page = NULL;
+	nand->ecc.write_page = NULL;
+	nand->ecc.read_oob = NULL;
+	nand->ecc.write_oob = NULL;
+	nand->ecc.hwctl = NULL;
+	nand->ecc.correct = NULL;
+	nand->ecc.calculate = NULL;
+
 	/* Setup the ecc configurations again */
-	if (!hardware) {
-		nand->ecc.mode = NAND_ECC_SOFT;
-		/* Use mtd default settings */
-		nand->ecc.layout = NULL;
-	} else {
+	if (hardware) {
 		nand->ecc.mode = NAND_ECC_HW;
 		nand->ecc.layout = &hw_nand_oob;
 		nand->ecc.size = 512;
@@ -264,6 +269,12 @@ void omap_nand_switch_ecc(int32_t hardware)
 		nand->ecc.correct = omap_correct_data;
 		nand->ecc.calculate = omap_calculate_ecc;
 		omap_hwecc_init(nand);
+		printf("HW ECC selected\n");
+	} else {
+		nand->ecc.mode = NAND_ECC_SOFT;
+		/* Use mtd default settings */
+		nand->ecc.layout = NULL;
+		printf("SW ECC selected\n");
 	}
 
 	/* Update NAND handling after ECC mode switch */
