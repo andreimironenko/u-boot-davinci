@@ -48,13 +48,13 @@ static void omap_nand_hwcontrol(struct mtd_info *mtd, int32_t cmd,
 	 */
 	switch (ctrl) {
 	case NAND_CTRL_CHANGE | NAND_CTRL_CLE:
-		this->IO_ADDR_W = gpmc_cs_base + GPMC_NAND_CMD;
+		this->IO_ADDR_W = gpmc_cs_base + OFFS(GPMC_NAND_CMD);
 		break;
 	case NAND_CTRL_CHANGE | NAND_CTRL_ALE:
-		this->IO_ADDR_W = gpmc_cs_base + GPMC_NAND_ADR;
+		this->IO_ADDR_W = gpmc_cs_base + OFFS(GPMC_NAND_ADR);
 		break;
 	case NAND_CTRL_CHANGE | NAND_NCE:
-		this->IO_ADDR_W = gpmc_cs_base + GPMC_NAND_DAT;
+		this->IO_ADDR_W = gpmc_cs_base + OFFS(GPMC_NAND_DAT);
 		break;
 	}
 
@@ -332,8 +332,8 @@ int board_nand_init(struct nand_chip *nand)
 	gpmc_config |= 0x10;
 	writel(gpmc_config, gpmc_base + OFFS(GPMC_CONFIG));
 
-	nand->IO_ADDR_R = gpmc_cs_base + GPMC_NAND_DAT;
-	nand->IO_ADDR_W = gpmc_cs_base + GPMC_NAND_CMD;
+	nand->IO_ADDR_R = gpmc_cs_base + OFFS(GPMC_NAND_DAT);
+	nand->IO_ADDR_W = gpmc_cs_base + OFFS(GPMC_NAND_CMD);
 
 	nand->cmd_ctrl = omap_nand_hwcontrol;
 	nand->options = NAND_NO_PADDING | NAND_CACHEPRG | NAND_NO_AUTOINCR |
