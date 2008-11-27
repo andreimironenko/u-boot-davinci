@@ -127,7 +127,7 @@ wait2:
 	nop
 	nop
 	nop
-	ldmfd sp!, {r4 - r6}
+	ldmfd	sp!, {r4 - r6}
 	mov	pc, lr		/* back to caller, locked */
 
 _go_to_speed: .word go_to_speed
@@ -171,15 +171,15 @@ pll_div_val5:
 
 .globl lowlevel_init
 lowlevel_init:
-	ldr	sp,	SRAM_STACK
-	str	ip,	[sp]	/* stash old link register */
-	mov	ip,	lr	/* save link reg across call */
-	bl	 s_init		/* go setup pll,mux,memory */
-	ldr	ip,	[sp]	/* restore save ip */
-	mov	lr,	ip	/* restore link reg */
+	ldr	sp, SRAM_STACK
+	str	ip, [sp]	/* stash old link register */
+	mov	ip, lr		/* save link reg across call */
+	bl	s_init		/* go setup pll, mux, memory */
+	ldr	ip, [sp]	/* restore save ip */
+	mov	lr, ip		/* restore link reg */
 
 	/* back to arch calling code */
-	mov	pc,	lr
+	mov	pc, lr
 
 	/* the literal pools origin */
 	.ltorg
@@ -190,7 +190,9 @@ SRAM_STACK:
 	.word LOW_LEVEL_SRAM_STACK
 
 /* DPLL(1-4) PARAM TABLES */
-/* Each of the tables has M, N, FREQSEL, M2 values defined for nominal
+
+/*
+ * Each of the tables has M, N, FREQSEL, M2 values defined for nominal
  * OPP (1.2V). The fields are defined according to dpll_param struct (clock.c).
  * The values are defined for all possible sysclk and for ES1 and ES2.
  */
@@ -198,162 +200,162 @@ SRAM_STACK:
 mpu_dpll_param:
 /* 12MHz */
 /* ES1 */
-.word 0x0FE, 0x07, 0x05, 0x01
+.word MPU_M_12_ES1, MPU_N_12_ES1, MPU_FSEL_12_ES1, MPU_M2_12_ES1
 /* ES2 */
-.word 0x0FA, 0x05, 0x07, 0x01
+.word MPU_M_12_ES2, MPU_N_12_ES2, MPU_FSEL_12_ES2, MPU_M2_ES2
 /* 3410 */
-.word 0x085, 0x05, 0x07, 0x01
+.word MPU_M_12, MPU_N_12, MPU_FSEL_12, MPU_M2_12
 
 /* 13MHz */
 /* ES1 */
-.word 0x17D, 0x0C, 0x03, 0x01
+.word MPU_M_13_ES1, MPU_N_13_ES1, MPU_FSEL_13_ES1, MPU_M2_13_ES1
 /* ES2 */
-.word 0x1F4, 0x0C, 0x03, 0x01
+.word MPU_M_13_ES2, MPU_N_13_ES2, MPU_FSEL_13_ES2, MPU_M2_13_ES2
 /* 3410 */
-.word 0x10A, 0x0C, 0x03, 0x01
+.word MPU_M_13, MPU_N_13, MPU_FSEL_13, MPU_M2_13
 
 /* 19.2MHz */
 /* ES1 */
-.word 0x179, 0x12, 0x04, 0x01
+.word MPU_M_19P2_ES1, MPU_N_19P2_ES1, MPU_FSEL_19P2_ES1, MPU_M2_19P2_ES1
 /* ES2 */
-.word 0x271, 0x17, 0x03, 0x01
+.word MPU_M_19P2_ES2, MPU_N_19P2_ES2, MPU_FSEL_19P2_ES2, MPU_M2_19P2_ES2
 /* 3410 */
-.word 0x14C, 0x17, 0x03, 0x01
+.word MPU_M_19P2, MPU_N_19P2, MPU_FSEL_19P2, MPU_M2_19P2
 
 /* 26MHz */
 /* ES1 */
-.word 0x17D, 0x19, 0x03, 0x01
+.word MPU_M_26_ES1, MPU_N_26_ES1, MPU_FSEL_26_ES1, MPU_M2_26_ES1
 /* ES2 */
-.word 0x0FA, 0x0C, 0x07, 0x01
+.word MPU_M_26_ES2, MPU_N_26_ES2, MPU_FSEL_26_ES2, MPU_M2_26_ES2
 /* 3410 */
-.word 0x085, 0x0C, 0x07, 0x01
+.word MPU_M_26, MPU_N_26, MPU_FSEL_26, MPU_M2_26
 
 /* 38.4MHz */
 /* ES1 */
-.word 0x1FA, 0x32, 0x03, 0x01
+.word MPU_M_38P4_ES1, MPU_N_38P4_ES1, MPU_FSEL_38P4_ES1, MPU_M2_38P4_ES1
 /* ES2 */
-.word 0x271, 0x2F, 0x03, 0x01
+.word MPU_M_38P4_ES2, MPU_N_38P4_ES2, MPU_FSEL_38P4_ES2, MPU_M2_38P4_ES2
 /* 3410 */
-.word 0x14C, 0x2F, 0x03, 0x01
+.word MPU_M_38P4, MPU_N_38P4, MPU_FSEL_38P4, MPU_M2_38P4
 
 
 .globl get_mpu_dpll_param
 get_mpu_dpll_param:
-	adr r0, mpu_dpll_param
-	mov pc, lr
+	adr	r0, mpu_dpll_param
+	mov	pc, lr
 
 iva_dpll_param:
 /* 12MHz */
 /* ES1 */
-.word 0x07D, 0x05, 0x07, 0x01
+.word IVA_M_12_ES1, IVA_N_12_ES1, IVA_FSEL_12_ES1, IVA_M2_12_ES1
 /* ES2 */
-.word 0x0B4, 0x05, 0x07, 0x01
+.word IVA_M_12_ES2, IVA_N_12_ES2, IVA_FSEL_12_ES2, IVA_M2_12_ES2
 /* 3410 */
-.word 0x085, 0x05, 0x07, 0x01
+.word IVA_M_12, IVA_N_12, IVA_FSEL_12, IVA_M2_12
 
 /* 13MHz */
 /* ES1 */
-.word 0x0FA, 0x0C, 0x03, 0x01
+.word IVA_M_13_ES1, IVA_N_13_ES1, IVA_FSEL_13_ES1, IVA_M2_13_ES1
 /* ES2 */
-.word 0x168, 0x0C, 0x03, 0x01
+.word IVA_M_13_ES2, IVA_N_13_ES2,  IVA_FSEL_13_ES2, IVA_M2_13_ES2
 /* 3410 */
-.word 0x10A, 0x0C, 0x03, 0x01
+.word IVA_M_13, IVA_N_13, IVA_FSEL_13, IVA_M2_13
 
 /* 19.2MHz */
 /* ES1 */
-.word 0x082, 0x09, 0x07, 0x01
+.word IVA_M_19P2_ES1, IVA_N_19P2_ES1, IVA_FSEL_19P2_ES1, IVA_M2_19P2_ES1
 /* ES2 */
-.word 0x0E1, 0x0B, 0x06, 0x01
+.word IVA_M_19P2_ES2, IVA_N_19P2_ES2, IVA_FSEL_19P2_ES2, IVA_M2_19P2_ES2
 /* 3410 */
-.word 0x14C, 0x17, 0x03, 0x01
+.word IVA_M_19P2, IVA_N_19P2, IVA_FSEL_19P2, IVA_M2_19P2
 
 /* 26MHz */
 /* ES1 */
-.word 0x07D, 0x0C, 0x07, 0x01
+.word IVA_M_26_ES1, IVA_N_26_ES1, IVA_FSEL_26_ES1, IVA_M2_26_ES1
 /* ES2 */
-.word 0x0B4, 0x0C, 0x07, 0x01
+.word IVA_M_26_ES2, IVA_N_26_ES2, IVA_FSEL_26_ES2, IVA_M2_26_ES2
 /* 3410 */
-.word 0x085, 0x0C, 0x07, 0x01
+.word IVA_M_26, IVA_N_26, IVA_FSEL_26, IVA_M2_26
 
 /* 38.4MHz */
 /* ES1 */
-.word 0x13F, 0x30, 0x03, 0x01
+.word IVA_M_38P4_ES1, IVA_N_38P4_ES1, IVA_FSEL_38P4_ES1, IVA_M2_38P4_ES1
 /* ES2 */
-.word 0x0E1, 0x17, 0x06, 0x01
+.word IVA_M_38P4_ES2, IVA_N_38P4_ES2, IVA_FSEL_38P4_ES2, IVA_M2_38P4_ES2
 /* 3410 */
-.word 0x14C, 0x2F, 0x03, 0x01
+.word IVA_M_38P4, IVA_N_38P4, IVA_FSEL_38P4, IVA_M2_38P4
 
 
 .globl get_iva_dpll_param
 get_iva_dpll_param:
-	adr r0, iva_dpll_param
-	mov pc, lr
+	adr	r0, iva_dpll_param
+	mov	pc, lr
 
 /* Core DPLL targets for L3 at 166 & L133 */
 core_dpll_param:
 /* 12MHz */
 /* ES1 */
-.word M_12_ES1, M_12_ES1, FSL_12_ES1, M2_12_ES1
+.word CORE_M_12_ES1, CORE_N_12_ES1, CORE_FSL_12_ES1, CORE_M2_12_ES1
 /* ES2 */
-.word M_12, N_12, FSEL_12, M2_12
+.word CORE_M_12, CORE_N_12, CORE_FSEL_12, CORE_M2_12
 /* 3410 */
-.word M_12, N_12, FSEL_12, M2_12
+.word CORE_M_12, CORE_N_12, CORE_FSEL_12, CORE_M2_12
 
 /* 13MHz */
 /* ES1 */
-.word M_13_ES1, N_13_ES1, FSL_13_ES1, M2_13_ES1
+.word CORE_M_13_ES1, CORE_N_13_ES1, CORE_FSL_13_ES1, CORE_M2_13_ES1
 /* ES2 */
-.word M_13,N_13,FSEL_13,M2_13
+.word CORE_M_13, CORE_N_13, CORE_FSEL_13, CORE_M2_13
 /* 3410 */
-.word M_13,N_13,FSEL_13,M2_13
+.word CORE_M_13, CORE_N_13, CORE_FSEL_13, CORE_M2_13
 
 /* 19.2MHz */
 /* ES1 */
-.word M_19p2_ES1, N_19p2_ES1, FSL_19p2_ES1, M2_19p2_ES1
+.word CORE_M_19P2_ES1, CORE_N_19P2_ES1, CORE_FSL_19P2_ES1, CORE_M2_19P2_ES1
 /* ES2 */
-.word M_19p2, N_19p2, FSEL_19p2, M2_19p2
+.word CORE_M_19P2, CORE_N_19P2, CORE_FSEL_19P2, CORE_M2_19P2
 /* 3410 */
-.word M_19p2, N_19p2, FSEL_19p2, M2_19p2
+.word CORE_M_19P2, CORE_N_19P2, CORE_FSEL_19P2, CORE_M2_19P2
 
 /* 26MHz */
 /* ES1 */
-.word M_26_ES1, N_26_ES1, FSL_26_ES1, M2_26_ES1
+.word CORE_M_26_ES1, CORE_N_26_ES1, CORE_FSL_26_ES1, CORE_M2_26_ES1
 /* ES2 */
-.word M_26, N_26, FSEL_26, M2_26
+.word CORE_M_26, CORE_N_26, CORE_FSEL_26, CORE_M2_26
 /* 3410 */
-.word M_26, N_26, FSEL_26, M2_26
+.word CORE_M_26, CORE_N_26, CORE_FSEL_26, CORE_M2_26
 
 /* 38.4MHz */
 /* ES1 */
-.word M_38p4_ES1, N_38p4_ES1, FSL_38p4_ES1, M2_38p4_ES1
+.word CORE_M_38P4_ES1, CORE_N_38P4_ES1, CORE_FSL_38P4_ES1, CORE_M2_38P4_ES1
 /* ES2 */
-.word M_38p4, N_38p4, FSEL_38p4, M2_38p4
+.word CORE_M_38P4, CORE_N_38P4, CORE_FSEL_38P4, CORE_M2_38P4
 /* 3410 */
-.word M_38p4, N_38p4, FSEL_38p4, M2_38p4
+.word CORE_M_38P4, CORE_N_38P4, CORE_FSEL_38P4, CORE_M2_38P4
 
 .globl get_core_dpll_param
 get_core_dpll_param:
-	adr r0, core_dpll_param
-	mov pc, lr
+	adr	r0, core_dpll_param
+	mov	pc, lr
 
 /* PER DPLL values are same for both ES1 and ES2 */
 per_dpll_param:
 /* 12MHz */
-.word 0xD8, 0x05, 0x07, 0x09
+.word PER_M_12, PER_N_12, PER_FSEL_12, PER_M2_12
 
 /* 13MHz */
-.word 0x1B0, 0x0C, 0x03, 0x09
+.word PER_M_13, PER_N_13, PER_FSEL_13, PER_M2_13
 
 /* 19.2MHz */
-.word 0xE1, 0x09, 0x07, 0x09
+.word PER_M_19P2, PER_N_19P2, PER_FSEL_19P2, PER_M2_19P2
 
 /* 26MHz */
-.word 0xD8, 0x0C, 0x07, 0x09
+.word PER_M_26, PER_N_26, PER_FSEL_26, PER_M2_26
 
 /* 38.4MHz */
-.word 0xE1, 0x13, 0x07, 0x09
+.word PER_M_38P4, PER_N_38P4, PER_FSEL_38P4, PER_M2_38P4
 
 .globl get_per_dpll_param
 get_per_dpll_param:
-	adr r0, per_dpll_param
-	mov pc, lr
+	adr	r0, per_dpll_param
+	mov	pc, lr
