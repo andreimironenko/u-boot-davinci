@@ -34,7 +34,6 @@
  */
 #include <common.h>
 #include <asm/io.h>
-#include <asm/arch/bits.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/mem.h>
 
@@ -255,7 +254,7 @@ void watchdog_init(void)
 
 	sr32(CM_FCLKEN_WKUP, 5, 1, 1);
 	sr32(CM_ICLKEN_WKUP, 5, 1, 1);
-	wait_on_value(BIT5, 0x20, CM_IDLEST_WKUP, 5);	/* some issue here */
+	wait_on_value(ST_WDT2, 0x20, CM_IDLEST_WKUP, 5); /* some issue here */
 
 	writel(WD_UNLOCK1, WD2_BASE + WSPR);
 	wait_for_command_complete(WD2_BASE);

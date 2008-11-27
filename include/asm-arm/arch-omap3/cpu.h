@@ -39,7 +39,8 @@
 #define PRODUCTION_ID		(OMAP34XX_TAP_BASE + 0x208)
 
 /* device type */
-#define DEVICE_MASK		(BIT8 | BIT9 | BIT10)
+#define DEVICE_MASK		(0x7 << 8)
+#define SYSBOOT_MASK		0x1F
 #define TST_DEVICE		0x0
 #define EMU_DEVICE		0x1
 #define HS_DEVICE		0x2
@@ -104,7 +105,7 @@
 #define SMS_SYSCONFIG		(OMAP34XX_SMS_BASE + 0x10)
 #define SMS_RG_ATT0		(OMAP34XX_SMS_BASE + 0x48)
 #define SMS_CLASS_ARB0		(OMAP34XX_SMS_BASE + 0xD0)
-#define BURSTCOMPLETE_GROUP7	BIT31
+#define BURSTCOMPLETE_GROUP7	(0x1 << 31)
 
 /* SDRC */
 #define SDRC_SYSCONFIG		(OMAP34XX_SDRC_BASE + 0x10)
@@ -115,13 +116,13 @@
 #define SDRC_DLLA_STATUS	(OMAP34XX_SDRC_BASE + 0x64)
 #define SDRC_DLLB_CTRL		(OMAP34XX_SDRC_BASE + 0x68)
 #define SDRC_DLLB_STATUS	(OMAP34XX_SDRC_BASE + 0x6C)
-#define DLLPHASE		BIT1
-#define LOADDLL			BIT2
+#define DLLPHASE		(0x1 << 1)
+#define LOADDLL			(0x1 << 2)
 #define DLL_DELAY_MASK		0xFF00
-#define DLL_NO_FILTER_MASK	(BIT8 | BIT9)
+#define DLL_NO_FILTER_MASK	((0x1 << 9) | (0x1 << 8))
 
 #define SDRC_POWER		(OMAP34XX_SDRC_BASE + 0x70)
-#define WAKEUPPROC		BIT26
+#define WAKEUPPROC		(0x1 << 26)
 
 #define SDRC_MCFG_0		(OMAP34XX_SDRC_BASE + 0x80)
 #define SDRC_MR_0		(OMAP34XX_SDRC_BASE + 0x84)
@@ -141,7 +142,7 @@
 #define CMD_ENTR_SRFRSH		0x5
 #define CMD_CKE_HIGH		0x6
 #define CMD_CKE_LOW		0x7
-#define SOFTRESET		BIT1
+#define SOFTRESET		(0x1 << 1)
 #define SMART_IDLE		(0x2 << 3)
 #define REF_ON_IDLE		(0x1 << 6)
 
@@ -162,7 +163,7 @@
 #define TSICR			0x40	/* rw */
 #define TCAR2			0x44	/* r */
 /* enable sys_clk NO-prescale /1 */
-#define GPT_EN			((0 << 2) | BIT1 | BIT0)
+#define GPT_EN			((0x0 << 2) | (0x1 << 1) | (0x1 << 0))
 
 /* Watchdog */
 #define WWPS			0x34	/* r */
@@ -210,6 +211,29 @@
 #define PRM_CLKSEL		0x48306d40
 #define PRM_RSTCTRL		0x48307250
 #define PRM_CLKSRC_CTRL		0x48307270
+#define SYSCLKDIV_1		(0x1 << 6)
+#define SYSCLKDIV_2		(0x1 << 7)
+
+#define CLKSEL_GPT1		(0x1 << 0)
+
+#define EN_GPT1			(0x1 << 0)
+#define EN_32KSYNC		(0x1 << 2)
+
+#define ST_WDT2			(0x1 << 5)
+
+#define ST_MPU_CLK		(0x1 << 0)
+
+#define ST_CORE_CLK		(0x1 << 0)
+
+#define ST_PERIPH_CLK		(0x1 << 1)
+
+#define ST_IVA2_CLK		(0x1 << 0)
+
+#define RESETDONE		(0x1 << 0)
+
+#define TCLR_ST			(0x1 << 0)
+#define TCLR_AR			(0x1 << 1)
+#define TCLR_PRE		(0x1 << 5)
 
 /* SMX-APE */
 #define PM_RT_APE_BASE_ADDR_ARM		(SMX_APE_BASE + 0x10000)

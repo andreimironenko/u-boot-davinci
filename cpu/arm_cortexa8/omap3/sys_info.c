@@ -27,7 +27,6 @@
 
 #include <common.h>
 #include <asm/io.h>
-#include <asm/arch/bits.h>
 #include <asm/arch/mem.h>	/* get mem tables */
 #include <asm/arch/sys_proto.h>
 #include <i2c.h>
@@ -110,14 +109,6 @@ u32 get_board_type(void)
 		return sysinfo.board_type_v2;
 	else
 		return sysinfo.board_type_v1;
-}
-
-/******************************************************************
- * get_sysboot_value() - get init word settings
- ******************************************************************/
-inline u32 get_sysboot_value(void)
-{
-	return 0x0000003F & readl(CONTROL_STATUS);
 }
 
 /***************************************************************************
@@ -249,10 +240,7 @@ u32 is_running_in_sdram(void)
  ***************************************************************/
 u32 get_boot_type(void)
 {
-	u32 v;
-
-	v = get_sysboot_value() & (BIT4 | BIT3 | BIT2 | BIT1 | BIT0);
-	return v;
+	return (readl(CONTROL_STATUS) & SYSBOOT_MASK);
 }
 
 /*************************************************************

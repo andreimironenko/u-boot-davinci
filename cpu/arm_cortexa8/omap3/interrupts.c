@@ -33,8 +33,7 @@
  */
 
 #include <common.h>
-#include <asm/arch/bits.h>
-
+#include <asm/io.h>
 #include <asm/proc-armv/ptrace.h>
 
 #define TIMER_LOAD_VAL 0
@@ -175,16 +174,11 @@ static ulong lastinc;
 /* nothing really to do with interrupts, just starts up a counter. */
 int interrupt_init(void)
 {
-	int32_t val;
-
-	/*
-	 * Start the counter ticking up
-	 * reload value on overflow
-	 */
-	*((int32_t *) (CONFIG_SYS_TIMERBASE + TLDR)) = TIMER_LOAD_VAL;
-	/* mask to enable timer */
-	val = (CONFIG_SYS_PVT << 2) | BIT5 | BIT1 | BIT0;
-	*((int32_t *) (CONFIG_SYS_TIMERBASE + TCLR)) = val;	/* start timer */
+	/* start the counter ticking up, reload value on overflow */
+	writel(TIMER_LOAD_VAL, CONFIG_SYS_TIMERBASE + TLDR);
+	/* enable timer */
+	writel((CONFIG_SYS_PVT << 2) | TCLR_PRE | TCLR_AR | TCLR_ST,
+		CONFIG_SYS_TIMERBASE + TCLR);
 
 	reset_timer_masked();	/* init the timestamp and lastinc value */
 

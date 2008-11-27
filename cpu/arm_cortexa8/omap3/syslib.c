@@ -23,7 +23,6 @@
 
 #include <common.h>
 #include <asm/io.h>
-#include <asm/arch/bits.h>
 #include <asm/arch/mem.h>
 #include <asm/arch/clocks.h>
 #include <asm/arch/sys_proto.h>

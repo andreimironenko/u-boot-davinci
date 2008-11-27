@@ -27,7 +27,6 @@
 
 #include <common.h>
 #include <asm/io.h>
-#include <asm/arch/bits.h>
 #include <asm/arch/mem.h>
 #include <asm/arch/sys_proto.h>
 #include <command.h>
@@ -177,7 +176,7 @@ void do_sdrc_init(u32 offset, u32 early)
 	if (early) {
 		/* reset sdrc controller */
 		writel(SOFTRESET, SDRC_SYSCONFIG);
-		wait_on_value(BIT0, BIT0, SDRC_STATUS, 12000000);
+		wait_on_value(RESETDONE, RESETDONE, SDRC_STATUS, 12000000);
 		writel(0, SDRC_SYSCONFIG);
 
 		/* setup sdrc to ball mux */

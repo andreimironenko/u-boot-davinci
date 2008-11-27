@@ -27,7 +27,6 @@
 
 #include <common.h>
 #include <asm/io.h>
-#include <asm/arch/bits.h>
 #include <asm/arch/clocks.h>
 #include <asm/arch/clocks_omap3.h>
 #include <asm/arch/mem.h>
@@ -46,17 +45,17 @@ u32 get_osc_clk_speed(void)
 	val = readl(PRM_CLKSRC_CTRL);
 
 	/* If SYS_CLK is being divided by 2, remove for now */
-	val = (val & (~BIT7)) | BIT6;
+	val = (val & (~SYSCLKDIV_2)) | SYSCLKDIV_1;
 	writel(val, PRM_CLKSRC_CTRL);
 
 	/* enable timer2 */
-	val = readl(CM_CLKSEL_WKUP) | BIT0;
+	val = readl(CM_CLKSEL_WKUP) | CLKSEL_GPT1;
 	writel(val, CM_CLKSEL_WKUP);	/* select sys_clk for GPT1 */
 
 	/* Enable I and F Clocks for GPT1 */
-	val = readl(CM_ICLKEN_WKUP) | BIT0 | BIT2;
+	val = readl(CM_ICLKEN_WKUP) | EN_GPT1 | EN_32KSYNC;
 	writel(val, CM_ICLKEN_WKUP);
-	val = readl(CM_FCLKEN_WKUP) | BIT0;
+	val = readl(CM_FCLKEN_WKUP) | EN_GPT1;
 	writel(val, CM_FCLKEN_WKUP);
 
 	writel(0, OMAP34XX_GPT1 + TLDR);	/* start counting at 0 */
@@ -160,7 +159,7 @@ void prcm_init(void)
 
 	/* Unlock MPU DPLL (slows things down, and needed later) */
 	sr32(CM_CLKEN_PLL_MPU, 0, 3, PLL_LOW_POWER_BYPASS);
-	wait_on_value(BIT0, 0, CM_IDLEST_PLL_MPU, LDELAY);
+	wait_on_value(ST_MPU_CLK, 0, CM_IDLEST_PLL_MPU, LDELAY);
 
 	/* Getting the base address of Core DPLL param table */
 	dpll_param_p = (dpll_param *) get_core_dpll_param();
@@ -173,7 +172,7 @@ void prcm_init(void)
 		 * sr32(CM_CLKSEL2_EMU) set override to work when asleep
 		 */
 		sr32(CM_CLKEN_PLL, 0, 3, PLL_FAST_RELOCK_BYPASS);
-		wait_on_value(BIT0, 0, CM_IDLEST_CKGEN, LDELAY);
+		wait_on_value(ST_CORE_CLK, 0, CM_IDLEST_CKGEN, LDELAY);
 
 		/*
 		 * For OMAP3 ES1.0 Errata 1.50, default value directly doesn't
@@ -194,7 +193,7 @@ void prcm_init(void)
 		sr32(CM_CLKEN_PLL, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
 		sr32(CM_CLKEN_PLL, 0, 3, PLL_LOCK);		/* lock mode */
 
-		wait_on_value(BIT0, 1, CM_IDLEST_CKGEN, LDELAY);
+		wait_on_value(ST_CORE_CLK, 1, CM_IDLEST_CKGEN, LDELAY);
 	} else if (is_running_in_flash()) {
 		/*
 		 * if running from flash, jump to small relocated code
@@ -223,7 +222,7 @@ void prcm_init(void)
 
 	/* PER DPLL */
 	sr32(CM_CLKEN_PLL, 16, 3, PLL_STOP);
-	wait_on_value(BIT1, 0, CM_IDLEST_CKGEN, LDELAY);
+	wait_on_value(ST_PERIPH_CLK, 0, CM_IDLEST_CKGEN, LDELAY);
 
 	/* Getting the base address to PER DPLL param table */
 	/* Set N */
@@ -253,7 +252,7 @@ void prcm_init(void)
 	sr32(CM_CLKSEL2_PLL, 0, 7, dpll_param_p->n);	/* set n */
 	sr32(CM_CLKEN_PLL, 20, 4, dpll_param_p->fsel);	/* FREQSEL */
 	sr32(CM_CLKEN_PLL, 16, 3, PLL_LOCK);		/* lock mode */
-	wait_on_value(BIT1, 2, CM_IDLEST_CKGEN, LDELAY);
+	wait_on_value(ST_PERIPH_CLK, 2, CM_IDLEST_CKGEN, LDELAY);
 
 	/* Getting the base address to MPU DPLL param table */
 	dpll_param_p = (dpll_param *) get_mpu_dpll_param();
@@ -267,7 +266,7 @@ void prcm_init(void)
 	sr32(CM_CLKSEL1_PLL_MPU, 0, 7, dpll_param_p->n);	/* Set N */
 	sr32(CM_CLKEN_PLL_MPU, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
 	sr32(CM_CLKEN_PLL_MPU, 0, 3, PLL_LOCK);	/* lock mode */
-	wait_on_value(BIT0, 1, CM_IDLEST_PLL_MPU, LDELAY);
+	wait_on_value(ST_MPU_CLK, 1, CM_IDLEST_PLL_MPU, LDELAY);
 
 	/* Getting the base address to IVA DPLL param table */
 	dpll_param_p = (dpll_param *) get_iva_dpll_param();
@@ -277,13 +276,13 @@ void prcm_init(void)
 
 	/* IVA DPLL (set to 12*20=240MHz) */
 	sr32(CM_CLKEN_PLL_IVA2, 0, 3, PLL_STOP);
-	wait_on_value(BIT0, 0, CM_IDLEST_PLL_IVA2, LDELAY);
+	wait_on_value(ST_IVA2_CLK, 0, CM_IDLEST_PLL_IVA2, LDELAY);
 	sr32(CM_CLKSEL2_PLL_IVA2, 0, 5, dpll_param_p->m2);	/* set M2 */
 	sr32(CM_CLKSEL1_PLL_IVA2, 8, 11, dpll_param_p->m);	/* set M */
 	sr32(CM_CLKSEL1_PLL_IVA2, 0, 7, dpll_param_p->n);	/* set N */
 	sr32(CM_CLKEN_PLL_IVA2, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
 	sr32(CM_CLKEN_PLL_IVA2, 0, 3, PLL_LOCK);	/* lock mode */
-	wait_on_value(BIT0, 1, CM_IDLEST_PLL_IVA2, LDELAY);
+	wait_on_value(ST_IVA2_CLK, 1, CM_IDLEST_PLL_IVA2, LDELAY);
 
 	/* Set up GPTimers to sys_clk source only */
 	sr32(CM_CLKSEL_PER, 0, 8, 0xff);
