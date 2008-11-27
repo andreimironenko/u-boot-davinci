@@ -141,7 +141,7 @@
 #define VS18_1V8SUP			(1 << 26)
 
 /* Driver definitions */
-#define MMCSD_SECTOR_SIZE		(512)
+#define MMCSD_SECTOR_SIZE		512
 #define MMC_CARD			0
 #define SD_CARD				1
 #define BYTE_MODE			0

@@ -103,14 +103,14 @@
 #define I2C_SYSTEST_SDA_I	(1 << 1)  /* SDA line sense input value */
 #define I2C_SYSTEST_SDA_O	(1 << 0)  /* SDA line drive output value */
 
-#define I2C_SCLL_SCLL		(0)
-#define I2C_SCLL_SCLL_M		(0xFF)
-#define I2C_SCLL_HSSCLL		(8)
-#define I2C_SCLH_HSSCLL_M	(0xFF)
-#define I2C_SCLH_SCLH		(0)
-#define I2C_SCLH_SCLH_M		(0xFF)
-#define I2C_SCLH_HSSCLH		(8)
-#define I2C_SCLH_HSSCLH_M	(0xFF)
+#define I2C_SCLL_SCLL		0
+#define I2C_SCLL_SCLL_M		0xFF
+#define I2C_SCLL_HSSCLL		8
+#define I2C_SCLH_HSSCLL_M	0xFF
+#define I2C_SCLH_SCLH		0
+#define I2C_SCLH_SCLH_M		0xFF
+#define I2C_SCLH_HSSCLH		8
+#define I2C_SCLH_HSSCLH_M	0xFF
 
 #define OMAP_I2C_STANDARD	100
 #define OMAP_I2C_FAST_MODE	400
@@ -122,7 +122,7 @@
 #define SYSTEM_CLOCK_96		96000
 
 #define I2C_IP_CLK		SYSTEM_CLOCK_96
-#define I2C_PSC_MAX		(0x0f)
-#define I2C_PSC_MIN		(0x00)
+#define I2C_PSC_MAX		0x0f
+#define I2C_PSC_MIN		0x00
 
 #endif /* _I2C_H_ */
