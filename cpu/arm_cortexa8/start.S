@@ -394,7 +394,7 @@ irq:
 	.align	5
 fiq:
 	get_fiq_stack
-	/* someone ought to write a more effiction fiq_save_user_regs */
+	/* someone ought to write a more effective fiq_save_user_regs */
 	irq_save_user_regs
 	bl	do_fiq
 	irq_restore_user_regs

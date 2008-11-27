@@ -68,10 +68,9 @@ static void write_p15_c1(unsigned long value)
 
 static void cp_delay(void)
 {
-	volatile int i;
-
 	/* Many OMAP regs need at least 2 nops */
-	for (i = 0; i < 100; i++) ;
+	asm("nop");
+	asm("nop");
 }
 
 /* See also ARM Ref. Man. */
