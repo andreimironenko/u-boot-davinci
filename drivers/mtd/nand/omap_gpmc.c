@@ -43,7 +43,8 @@ static void omap_nand_hwcontrol(struct mtd_info *mtd, int32_t cmd,
 {
 	register struct nand_chip *this = mtd->priv;
 
-	/* Point the IO_ADDR to DATA and ADDRESS registers instead
+	/*
+	 * Point the IO_ADDR to DATA and ADDRESS registers instead
 	 * of chip address
 	 */
 	switch (ctrl) {
@@ -70,8 +71,10 @@ static void omap_nand_hwcontrol(struct mtd_info *mtd, int32_t cmd,
  */
 static void omap_hwecc_init(struct nand_chip *chip)
 {
-	/* Init ECC Control Register */
-	/* Clear all ECC | Enable Reg1 */
+	/*
+	 * Init ECC Control Register
+	 * Clear all ECC | Enable Reg1
+	 */
 	writel(ECCCLEAR | ECCRESULTREG1, gpmc_base + OFFS(GPMC_ECC_CONTROL));
 	writel(ECCSIZE1 | ECCSIZE0 | ECCSIZE0SEL,
 	       gpmc_base + OFFS(GPMC_ECC_SIZE_CONFIG));
@@ -183,7 +186,8 @@ static int omap_calculate_ecc(struct mtd_info *mtd, const uint8_t *dat,
 	ecc_code[1] = (val >> 16) & 0xFF;
 	ecc_code[2] = ((val >> 8) & 0x0F) | ((val >> 20) & 0xF0);
 
-	/* Stop reading anymore ECC vals and clear old results
+	/*
+	 * Stop reading anymore ECC vals and clear old results
 	 * enable will be called if more reads are required
 	 */
 	writel(0x000, gpmc_base + OFFS(GPMC_ECC_CONFIG));
@@ -207,7 +211,8 @@ static void omap_enable_hwecc(struct mtd_info *mtd, int32_t mode)
 		/* Clear the ecc result registers, select ecc reg as 1 */
 		writel(ECCCLEAR | ECCRESULTREG1,
 		       gpmc_base + OFFS(GPMC_ECC_CONTROL));
-		/* Size 0 = 0xFF, Size1 is 0xFF - both are 512 bytes
+		/*
+		 * Size 0 = 0xFF, Size1 is 0xFF - both are 512 bytes
 		 * tell all regs to generate size0 sized regs
 		 * we just have a single ECC engine for all CS
 		 */
@@ -222,7 +227,7 @@ static void omap_enable_hwecc(struct mtd_info *mtd, int32_t mode)
 	}
 }
 
-/**
+/*
  * omap_nand_switch_ecc - switch the ECC operation b/w h/w ecc and s/w ecc.
  * The default is to come up on s/w ecc
  *
@@ -301,14 +306,16 @@ int board_nand_init(struct nand_chip *nand)
 	int32_t gpmc_config = 0;
 	cs = 0;
 
-	/* xloader/Uboot's gpmc configuration would have configured GPMC for
+	/*
+	 * xloader/Uboot's gpmc configuration would have configured GPMC for
 	 * nand type of memory. The following logic scans and latches on to the
 	 * first CS with NAND type memory.
 	 * TBD: need to make this logic generic to handle multiple CS NAND
 	 * devices.
 	 */
 	while (cs < GPMC_MAX_CS) {
-		/* Each GPMC set for a single CS is at offset 0x30
+		/*
+		 * Each GPMC set for a single CS is at offset 0x30
 		 * - already remapped for us
 		 */
 		gpmc_cs_base = (void __iomem *)(GPMC_CONFIG_CS0_BASE +

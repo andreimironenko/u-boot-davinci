@@ -101,9 +101,11 @@ static int setup_net_chip(void)
 	(*(volatile int *)(OMAP34XX_GPMC_BASE + 0x0164)) = 0x00000FCF;
 	(*(volatile int *)(OMAP34XX_GPMC_BASE + 0x0168)) = 0x00000f6c;
 
-	/* Configure PIN MUX registers */
-	/* Enable GPMC Pin Mux Registers */
-	/* Enable GPMC_CLK Pin in CONTROL_PADCONF_gpmc_ncs7 register */
+	/*
+	 * Configure PIN MUX registers
+	 * Enable GPMC Pin Mux Registers
+	 * Enable GPMC_CLK Pin in CONTROL_PADCONF_gpmc_ncs7 register
+	 */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xBC)) |= 0x00180000;
 	/* Enable CS5 Pin in CONTROL_PADCONF_gpmc_ncs5 register */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xB8)) |= 0x00000018;
@@ -115,8 +117,10 @@ static int setup_net_chip(void)
 	/* Enable gpmc_nbe0_cle in CONTROL_PADCONF_GPMC_NWE register */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xC4)) |= 0x00180000;
 
-	/* Enable gpmc_nbe1 in CONTROL_PADCONF_GPMC_NBE1 register and
-	configuring the mux mode to 0 */
+	/*
+	 * Enable gpmc_nbe1 in CONTROL_PADCONF_GPMC_NBE1 register and
+	 * configuring the mux mode to 0
+	 */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xC8)) |= 0x00000018;
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xC8)) &= 0xFFFFFFF8;
 	/* Enable d15 in CONTROL_PADCONF_GPMC_D15 register */
@@ -155,20 +159,26 @@ static int setup_net_chip(void)
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0x78)) &= 0xFFFFFFF8;
 
 #if defined(CPU_3430_ES1) || defined(CPU_3430_ES2)
-	/* GPIO 64 configuration in CONTROL_PADCONF_GPMC_WAIT2
-	register mux mode is 4. */
+	/*
+	 * GPIO 64 configuration in CONTROL_PADCONF_GPMC_WAIT2
+	 * register mux mode is 4.
+	 */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xD0)) |= 0x00000018;
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xD0)) &= 0xFFFFFFF8;
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0xD0)) |= 0x00000004;
 
-	/* Configure GPIO 176 in CONTROL_PADCONF_MCSPI1_CS1
-	register for ethernet ISR mux mode is 4 */
+	/*
+	 * Configure GPIO 176 in CONTROL_PADCONF_MCSPI1_CS1
+	 * register for ethernet ISR mux mode is 4
+	 */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0x1D0)) |= 0x00180000;
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0x1D0)) &= 0xFFF8FFFF;
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0x1D0)) |= 0x00040000;
 
-	/* Enable Clock for GPIO 1-6 module in CM_FCLKEN_PER
-	and CM_ICLKEN_PER registers */
+	/*
+	 * Enable Clock for GPIO 1-6 module in CM_FCLKEN_PER
+	 * and CM_ICLKEN_PER registers
+	 */
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0x5000)) |= 0x0003E800;
 	(*(volatile int *)(OMAP34XX_CTRL_BASE + 0x5010)) |= 0x0003E800;
 

@@ -32,7 +32,8 @@
 #include <asm/arch/sys_proto.h>
 #include <command.h>
 
-/* Only One NAND allowed on board at a time.
+/*
+ * Only One NAND allowed on board at a time.
  * The GPMC CS Base for the same
  */
 unsigned int boot_flash_base;
@@ -250,7 +251,8 @@ void gpmc_init(void)
 	config &= (~0xf00);
 	writel(config, gpmc_base + OFFS(GPMC_CONFIG));
 
-	/* Disable the GPMC0 config set by ROM code
+	/*
+	 * Disable the GPMC0 config set by ROM code
 	 * It conflicts with our MPDB (both at 0x08000000)
 	 */
 	writel(0, gpmc_cs_base + OFFS(GPMC_CONFIG7));

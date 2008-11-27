@@ -189,7 +189,8 @@
 
 #define CONFIG_SYS_LOAD_ADDR		(OMAP34XX_SDRC_CS0) /* default load address */
 
-/* 2430 has 12 GP timers, they can be driven by the SysClk (12/13/19.2) or by
+/*
+ * 2430 has 12 GP timers, they can be driven by the SysClk (12/13/19.2) or by
  * 32KHz clk, or from external sig. This rate is divided by a local divisor.
  */
 #define V_PVT			7

@@ -41,7 +41,9 @@ static u32 *gpmc_base = (u32 *)GPMC_BASE;
 u32 get_cpu_rev(void)
 {
 	u32 cpuid = 0;
-	/* On ES1.0 the IDCODE register is not exposed on L4
+
+	/*
+	 * On ES1.0 the IDCODE register is not exposed on L4
 	 * so using CPU ID to differentiate
 	 * between ES2.0 and ES1.0.
 	 */

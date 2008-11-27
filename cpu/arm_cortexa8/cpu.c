@@ -185,8 +185,10 @@ void l2cache_enable()
 		__asm__ __volatile__("mov %0, r12":"=r"(j));
 		__asm__ __volatile__("mov %0, r0":"=r"(i));
 
-		/* GP Device ROM code API usage here */
-		/* r12 = AUXCR Write function and r0 value */
+		/*
+		 * GP Device ROM code API usage here
+		 * r12 = AUXCR Write function and r0 value
+		 */
 		__asm__ __volatile__("mov r12, #0x3");
 		__asm__ __volatile__("mrc p15, 0, r0, c1, c0, 1");
 		__asm__ __volatile__("orr r0, r0, #0x2");
@@ -213,8 +215,10 @@ void l2cache_disable()
 		__asm__ __volatile__("mov %0, r12":"=r"(j));
 		__asm__ __volatile__("mov %0, r0":"=r"(i));
 
-		/* GP Device ROM code API usage here */
-		/* r12 = AUXCR Write function and r0 value */
+		/*
+		 * GP Device ROM code API usage here
+		 * r12 = AUXCR Write function and r0 value
+		 */
 		__asm__ __volatile__("mov r12, #0x3");
 		__asm__ __volatile__("mrc p15, 0, r0, c1, c0, 1");
 		__asm__ __volatile__("bic r0, r0, #0x2");

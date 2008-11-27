@@ -131,7 +131,8 @@ void prcm_init(void)
 
 	xip_safe = is_running_in_sram();
 
-	/* Gauge the input clock speed and find out the sys_clkin_sel
+	/*
+	 * Gauge the input clock speed and find out the sys_clkin_sel
 	 * value corresponding to the input clock.
 	 */
 	osc_clk = get_osc_clk_speed();
@@ -148,7 +149,8 @@ void prcm_init(void)
 		clk_index = sys_clkin_sel;
 	}
 
-	/* The DPLL tables are defined according to sysclk value and
+	/*
+	 * The DPLL tables are defined according to sysclk value and
 	 * silicon revision. The clk_index value will be used to get
 	 * the values for that input sysclk from the DPLL param table
 	 * and sil_index will get the values for that SysClk for the
@@ -166,12 +168,15 @@ void prcm_init(void)
 	/* Moving it to the right sysclk and ES rev base */
 	dpll_param_p = dpll_param_p + 3 * clk_index + sil_index;
 	if (xip_safe) {
-		/* CORE DPLL */
-		/* sr32(CM_CLKSEL2_EMU) set override to work when asleep */
+		/*
+		 * CORE DPLL
+		 * sr32(CM_CLKSEL2_EMU) set override to work when asleep
+		 */
 		sr32(CM_CLKEN_PLL, 0, 3, PLL_FAST_RELOCK_BYPASS);
 		wait_on_value(BIT0, 0, CM_IDLEST_CKGEN, LDELAY);
 
-		/* For OMAP3 ES1.0 Errata 1.50, default value directly doesnt
+		/*
+		 * For OMAP3 ES1.0 Errata 1.50, default value directly doesn't
 		 * work. write another value and then default value.
 		 */
 		sr32(CM_CLKSEL1_EMU, 16, 5, CORE_M3X2 + 1);	/* m3x2 */
@@ -191,8 +196,10 @@ void prcm_init(void)
 
 		wait_on_value(BIT0, 1, CM_IDLEST_CKGEN, LDELAY);
 	} else if (is_running_in_flash()) {
-		/* if running from flash, jump to small relocated code
-		   area in SRAM. */
+		/*
+		 * if running from flash, jump to small relocated code
+		 * area in SRAM.
+		 */
 		p0 = readl(CM_CLKEN_PLL);
 		sr32((u32) &p0, 0, 3, PLL_FAST_RELOCK_BYPASS);
 		sr32((u32) &p0, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
@@ -225,7 +232,8 @@ void prcm_init(void)
 	/* Moving it to the right sysclk base */
 	dpll_param_p = dpll_param_p + clk_index;
 
-	/* Errata 1.50 Workaround for OMAP3 ES1.0 only
+	/*
+	 * Errata 1.50 Workaround for OMAP3 ES1.0 only
 	 * If using default divisors, write default divisor + 1
 	 * and then the actual divisor value
 	 */

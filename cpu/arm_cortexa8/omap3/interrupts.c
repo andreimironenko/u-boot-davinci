@@ -177,8 +177,10 @@ int interrupt_init(void)
 {
 	int32_t val;
 
-	/* Start the counter ticking up */
-	/* reload value on overflow */
+	/*
+	 * Start the counter ticking up
+	 * reload value on overflow
+	 */
 	*((int32_t *) (CONFIG_SYS_TIMERBASE + TLDR)) = TIMER_LOAD_VAL;
 	/* mask to enable timer */
 	val = (CONFIG_SYS_PVT << 2) | BIT5 | BIT1 | BIT0;

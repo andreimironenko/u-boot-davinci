@@ -101,8 +101,10 @@ void secureworld_exit()
 	__asm__ __volatile__("mrc p15, 0, %0, c1, c1, 2":"=r"(i));
 	/* enabling co-processor CP10 and CP11 accesses in NS world */
 	__asm__ __volatile__("orr %0, %0, #0xC00":"=r"(i));
-	/* allow allocation of locked TLBs and L2 lines in NS world */
-	/* allow use of PLE registers in NS world also */
+	/*
+	 * allow allocation of locked TLBs and L2 lines in NS world
+	 * allow use of PLE registers in NS world also
+	 */
 	__asm__ __volatile__("orr %0, %0, #0x70000":"=r"(i));
 	__asm__ __volatile__("mcr p15, 0, %0, c1, c1, 2":"=r"(i));
 
@@ -130,8 +132,10 @@ void setup_auxcr()
 	__asm__ __volatile__("mov %0, r12":"=r"(j));
 	__asm__ __volatile__("mov %0, r0":"=r"(i));
 
-	/* GP Device ROM code API usage here */
-	/* r12 = AUXCR Write function and r0 value */
+	/*
+	 * GP Device ROM code API usage here
+	 * r12 = AUXCR Write function and r0 value
+	 */
 	__asm__ __volatile__("mov r12, #0x3");
 	__asm__ __volatile__("mrc p15, 0, r0, c1, c0, 1");
 	/* Enabling ASA */
@@ -154,17 +158,21 @@ void try_unlock_memory()
 	int mode;
 	int in_sdram = is_running_in_sdram();
 
-	/* if GP device unlock device SRAM for general use */
-	/* secure code breaks for Secure/Emulation device - HS/E/T */
+	/*
+	 * if GP device unlock device SRAM for general use
+	 * secure code breaks for Secure/Emulation device - HS/E/T
+	 */
 	mode = get_device_type();
 	if (mode == GP_DEVICE)
 		secure_unlock_mem();
 
-	/* If device is EMU and boot is XIP external booting
+	/*
+	 * If device is EMU and boot is XIP external booting
 	 * Unlock firewalls and disable L2 and put chip
 	 * out of secure world
+	 *
+	 * Assuming memories are unlocked by the demon who put us in SDRAM
 	 */
-	/* Assuming memories are unlocked by the demon who put us in SDRAM */
 	if ((mode <= EMU_DEVICE) && (get_boot_type() == 0x1F)
 	    && (!in_sdram)) {
 		secure_unlock_mem();
@@ -187,8 +195,10 @@ void s_init(void)
 
 	try_unlock_memory();
 
-	/* Right now flushing at low MPU speed.
-	   Need to move after clock init */
+	/*
+	 * Right now flushing at low MPU speed.
+	 * Need to move after clock init
+	 */
 	v7_flush_dcache_all(get_device_type());
 #ifndef CONFIG_ICACHE_OFF
 	icache_enable();
@@ -199,8 +209,9 @@ void s_init(void)
 #else
 	l2cache_enable();
 #endif
-	/* Writing to AuxCR in U-boot using SMI for GP DEV */
-	/* Currently SMI in Kernel on ES2 devices seems to have an isse
+	/*
+	 * Writing to AuxCR in U-boot using SMI for GP DEV
+	 * Currently SMI in Kernel on ES2 devices seems to have an isse
 	 * Once that is resolved, we can postpone this config to kernel
 	 */
 	if (get_device_type() == GP_DEVICE)
@@ -235,7 +246,8 @@ void wait_for_command_complete(unsigned int wd_base)
  *****************************************************************************/
 void watchdog_init(void)
 {
-	/* There are 3 watch dogs WD1=Secure, WD2=MPU, WD3=IVA. WD1 is
+	/*
+	 * There are 3 watch dogs WD1=Secure, WD2=MPU, WD3=IVA. WD1 is
 	 * either taken care of by ROM (HS/EMU) or not accessible (GP).
 	 * We need to take care of WD2-MPU or take a PRCM reset. WD3
 	 * should not be running and does not generate a PRCM reset.
@@ -264,7 +276,8 @@ int dram_init(void)
 
 	display_board_info(btype);
 
-	/* If a second bank of DDR is attached to CS1 this is
+	/*
+	 * If a second bank of DDR is attached to CS1 this is
 	 * where it can be started.  Early init code will init
 	 * memory on CS0.
 	 */

@@ -110,11 +110,11 @@
 
 #define CPU_3430	0x3430
 
-/* 343x real hardware:
+/*
+ * 343x real hardware:
  *  ES1     = rev 0
- */
-
-/* 343x code defines:
+ *
+ * 343x code defines:
  * ES1     = 0+1 = 1
  * ES1     = 1+1 = 1
  */
