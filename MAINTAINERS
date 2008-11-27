@@ -589,6 +589,10 @@ Stefan Roese <sr@denx.de>
 	pdnb3		xscale
 	scpu		xscale
 
+Steve Sakoman <sakoman@gmail.com>
+
+	omap3_overo	ARM CORTEX-A8 (OMAP3xx SoC)
+
 Robert Schwebel <r.schwebel@pengutronix.de>
 
 	csb226		xscale

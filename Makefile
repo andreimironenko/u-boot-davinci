@@ -2795,6 +2795,9 @@ omap3_beagle_config :	unconfig
 omap3_evm_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexa8 evm omap3 omap3
 
+omap3_overo_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexa8 overo omap3 omap3
+
 #########################################################################
 ## XScale Systems
 #########################################################################
