@@ -77,13 +77,49 @@
 #define SYNC_32KTIMER_BASE		0x48320000
 #define S32K_CR				(SYNC_32KTIMER_BASE + 0x10)
 
-/* omap3 GPIO registers */
+/* OMAP3 GPIO registers */
 #define OMAP34XX_GPIO1_BASE		0x48310000
 #define OMAP34XX_GPIO2_BASE		0x49050000
 #define OMAP34XX_GPIO3_BASE		0x49052000
 #define OMAP34XX_GPIO4_BASE		0x49054000
 #define OMAP34XX_GPIO5_BASE		0x49056000
 #define OMAP34XX_GPIO6_BASE		0x49058000
+
+#define GPIO_OE				0x34
+#define GPIO_SETDATAOUT			0x94
+
+#define GPIO0				(0x1 << 0)
+#define GPIO1				(0x1 << 1)
+#define GPIO2				(0x1 << 2)
+#define GPIO3				(0x1 << 3)
+#define GPIO4				(0x1 << 4)
+#define GPIO5				(0x1 << 5)
+#define GPIO6				(0x1 << 6)
+#define GPIO7				(0x1 << 7)
+#define GPIO8				(0x1 << 8)
+#define GPIO9				(0x1 << 9)
+#define GPIO10				(0x1 << 10)
+#define GPIO11				(0x1 << 11)
+#define GPIO12				(0x1 << 12)
+#define GPIO13				(0x1 << 13)
+#define GPIO14				(0x1 << 14)
+#define GPIO15				(0x1 << 15)
+#define GPIO16				(0x1 << 16)
+#define GPIO17				(0x1 << 17)
+#define GPIO18				(0x1 << 18)
+#define GPIO19				(0x1 << 19)
+#define GPIO20				(0x1 << 20)
+#define GPIO21				(0x1 << 21)
+#define GPIO22				(0x1 << 22)
+#define GPIO23				(0x1 << 23)
+#define GPIO24				(0x1 << 24)
+#define GPIO25				(0x1 << 25)
+#define GPIO26				(0x1 << 26)
+#define GPIO27				(0x1 << 27)
+#define GPIO28				(0x1 << 28)
+#define GPIO29				(0x1 << 29)
+#define GPIO30				(0x1 << 30)
+#define GPIO31				(0x1 << 31)
 
 /* base address for indirect vectors (internal boot mode) */
 #define SRAM_OFFSET0			0x40000000
@@ -131,5 +167,37 @@
 /* EVM definitions */
 #define OMAP3EVM_V1		0x1
 #define OMAP3EVM_V2		0x2
+
+/* I2C power management companion definitions */
+#define PWRMGT_ADDR_ID1		0x48
+#define PWRMGT_ADDR_ID2		0x49
+#define PWRMGT_ADDR_ID3		0x4A
+#define PWRMGT_ADDR_ID4		0x4B
+
+/* I2C ID3 (slave3) register */
+#define LEDEN			0xEE
+
+#define LEDAON			(0x1 << 0)
+#define LEDBON			(0x1 << 1)
+#define LEDAPWM			(0x1 << 4)
+#define LEDBPWM			(0x1 << 5)
+
+/* I2C ID4 (slave4) register */
+#define VAUX2_DEV_GRP		0x76
+#define VAUX2_DEDICATED		0x79
+#define VAUX3_DEV_GRP		0x7A
+#define VAUX3_DEDICATED		0x7D
+#define VPLL2_DEV_GRP		0x8E
+#define VPLL2_DEDICATED		0x91
+#define VDAC_DEV_GRP		0x96
+#define VDAC_DEDICATED		0x99
+
+#define DEV_GRP_P1		0x20
+#define DEV_GRP_ALL		0xE0
+
+#define VAUX2_VSEL_28		0x09
+#define VAUX3_VSEL_28		0x03
+#define VPLL2_VSEL_18		0x05
+#define VDAC_VSEL_18		0x03
 
 #endif

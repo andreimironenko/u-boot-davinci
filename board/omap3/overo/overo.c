@@ -2,10 +2,10 @@
  * Maintainer : Steve Sakoman <steve@sakoman.com>
  *
  * Derived from Beagle Board, 3430 SDP, and OMAP3EVM code by
- *      Richard Woodruff <r-woodruff2@ti.com>
- *      Syed Mohammed Khasim <khasim@ti.com>
- *      Sunil Kumar <sunilsaini05@gmail.com>
- *      Shashi Ranjan <shashiranjanmca05@gmail.com>
+ *	Richard Woodruff <r-woodruff2@ti.com>
+ *	Syed Mohammed Khasim <khasim@ti.com>
+ *	Sunil Kumar <sunilsaini05@gmail.com>
+ *	Shashi Ranjan <shashiranjanmca05@gmail.com>
  *
  * (C) Copyright 2004-2008
  * Texas Instruments, <www.ti.com>
@@ -55,47 +55,65 @@ int board_init(void)
 
 /******************************************************************************
  * Routine: misc_init_r
- * Description: Init ethernet (done here so udelay works)
+ * Description: Configure power supply
  *****************************************************************************/
 int misc_init_r(void)
 {
 
 	unsigned char byte;
+	unsigned int *gpio5_base = (unsigned int *)OMAP34XX_GPIO5_BASE;
+	unsigned int *gpio6_base = (unsigned int *)OMAP34XX_GPIO6_BASE;
 
 #ifdef CONFIG_DRIVER_OMAP34XX_I2C
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
 #endif
-	/* set vaux2 to 2.8V */
-	byte = 0x20;
-	i2c_write(0x4B, 0x76, 1, &byte, 1);
-	byte = 0x09;
-	i2c_write(0x4B, 0x79, 1, &byte, 1);
 
-	/* set vaux3 to 2.8V */
-	byte = 0x20;
-	i2c_write(0x4B, 0x7A, 1, &byte, 1);
-	byte = 0x03;
-	i2c_write(0x4B, 0x7D, 1, &byte, 1);
+	/*
+	 * Configure OMAP3 supply voltages in power management
+	 * companion chip.
+	 */
 
-	/* set vpll2 to 1.8V */
-	byte = 0xE0;
-	i2c_write(0x4B, 0x8E, 1, &byte, 1);
-	byte = 0x05;
-	i2c_write(0x4B, 0x91, 1, &byte, 1);
+	/* set VAUX2 to 2.8V */
+	byte = DEV_GRP_P1;
+	i2c_write(PWRMGT_ADDR_ID4, VAUX2_DEV_GRP, 1, &byte, 1);
+	byte = VAUX2_VSEL_28;
+	i2c_write(PWRMGT_ADDR_ID4, VAUX2_DEDICATED, 1, &byte, 1);
+
+	/* set VAUX3 to 2.8V */
+	byte = DEV_GRP_P1;
+	i2c_write(PWRMGT_ADDR_ID4, VAUX3_DEV_GRP, 1, &byte, 1);
+	byte = VAUX3_VSEL_28;
+	i2c_write(PWRMGT_ADDR_ID4, VAUX3_DEDICATED, 1, &byte, 1);
+
+	/* set VPLL2 to 1.8V */
+	byte = DEV_GRP_ALL;
+	i2c_write(PWRMGT_ADDR_ID4, VPLL2_DEV_GRP, 1, &byte, 1);
+	byte = VPLL2_VSEL_18;
+	i2c_write(PWRMGT_ADDR_ID4, VPLL2_DEDICATED, 1, &byte, 1);
 
 	/* set VDAC to 1.8V */
-	byte = 0x20;
-	i2c_write(0x4B, 0x96, 1, &byte, 1);
-	byte = 0x03;
-	i2c_write(0x4B, 0x99, 1, &byte, 1);
+	byte = DEV_GRP_P1;
+	i2c_write(PWRMGT_ADDR_ID4, VDAC_DEV_GRP, 1, &byte, 1);
+	byte = VDAC_VSEL_18;
+	i2c_write(PWRMGT_ADDR_ID4, VDAC_DEDICATED, 1, &byte, 1);
 
-	byte = 0x33;
-	i2c_write(0x4A, 0xEE, 1, &byte, 1);
+	/* enable LED */
+	byte = LEDBPWM | LEDAPWM | LEDBON | LEDAON;
+	i2c_write(PWRMGT_ADDR_ID3, LEDEN, 1, &byte, 1);
 
-	*((uint *) 0x49058034) = 0xFFFFFAF9;
-	*((uint *) 0x49056034) = 0x0F9F0FFF;
-	*((uint *) 0x49058094) = 0x00000506;
-	*((uint *) 0x49056094) = 0xF060F000;
+	/* Configure GPIOs to output */
+	writel(~((GPIO10) | GPIO9 | GPIO3 | GPIO2),
+		gpio6_base + OFFS(GPIO_OE));
+	writel(~(GPIO31 | GPIO30 | GPIO29 | GPIO28 | GPIO22 | GPIO21 |
+		GPIO15 | GPIO14 | GPIO13 | GPIO12),
+		gpio5_base + OFFS(GPIO_OE));
+
+	/* Set GPIOs */
+	writel(GPIO10 | GPIO9 | GPIO3 | GPIO2,
+		gpio6_base + OFFS(GPIO_SETDATAOUT));
+	writel(GPIO31 | GPIO30 | GPIO29 | GPIO28 | GPIO22 | GPIO21 |
+		GPIO15 | GPIO14 | GPIO13 | GPIO12,
+		gpio5_base + OFFS(GPIO_SETDATAOUT));
 
 	return 0;
 }
@@ -103,8 +121,8 @@ int misc_init_r(void)
 /******************************************************************************
  * Routine: set_muxconf_regs
  * Description: Setting up the configuration Mux registers specific to the
- *              hardware. Many pins need to be moved from protect to primary
- *              mode.
+ *		hardware. Many pins need to be moved from protect to primary
+ *		mode.
  *****************************************************************************/
 void set_muxconf_regs(void)
 {
