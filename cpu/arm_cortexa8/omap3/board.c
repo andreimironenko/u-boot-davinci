@@ -136,6 +136,8 @@ void setup_auxcr()
 	__asm__ __volatile__("mrc p15, 0, r0, c1, c0, 1");
 	/* Enabling ASA */
 	__asm__ __volatile__("orr r0, r0, #0x10");
+	/* Enable L1NEON */
+	__asm__ __volatile__("orr r0, r0, #1 << 5");
 	/* SMI instruction to call ROM Code API */
 	__asm__ __volatile__(".word 0xE1600070");
 	__asm__ __volatile__("mov r0, %0":"=r"(i));
