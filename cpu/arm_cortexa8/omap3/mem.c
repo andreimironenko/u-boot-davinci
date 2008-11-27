@@ -233,17 +233,14 @@ void enable_gpmc_config(u32 *gpmc_config, u32 *gpmc_cs_base, u32 base,
 void gpmc_init(void)
 {
 	/* putting a blanket check on GPMC based on ZeBu for now */
-	u32 mux = 0, mwidth;
 	u32 *gpmc_config = NULL;
 	u32 *gpmc_base = (u32 *)GPMC_BASE;
+	u32 *gpmc_cs_base = (u32 *)GPMC_CONFIG_CS0_BASE;
 	u32 base = 0;
 	u32 size = 0;
 	u32 f_off = CONFIG_SYS_MONITOR_LEN;
 	u32 f_sec = 0;
 	u32 config = 0;
-
-	mux = BIT9;
-	mwidth = get_gpmc0_width();
 
 	/* global settings */
 	writel(0, gpmc_base + OFFS(GPMC_IRQENABLE)); /* isr's sources masked */
@@ -256,7 +253,7 @@ void gpmc_init(void)
 	/* Disable the GPMC0 config set by ROM code
 	 * It conflicts with our MPDB (both at 0x08000000)
 	 */
-	writel(0, GPMC_CONFIG_CS0 + GPMC_CONFIG7);
+	writel(0, gpmc_cs_base + OFFS(GPMC_CONFIG7));
 	sdelay(1000);
 
 #if defined(CONFIG_CMD_NAND)	/* CS 0 */
@@ -280,7 +277,7 @@ void gpmc_init(void)
 
 #if defined(CONFIG_CMD_ONENAND)
 	gpmc_config = gpmc_onenand;
-	onenand_cs_base = (u32 *)(GPMC_CONFIG_CS0 +
+	onenand_cs_base = (u32 *)(GPMC_CONFIG_CS0_BASE +
 				  (GPMC_CS * GPMC_CONFIG_WIDTH));
 	base = PISMO1_ONEN_BASE;
 	size = PISMO1_ONEN_SIZE;
