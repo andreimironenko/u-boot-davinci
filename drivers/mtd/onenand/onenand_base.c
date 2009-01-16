@@ -23,6 +23,36 @@
 #include <asm/errno.h>
 #include <malloc.h>
 
+/**
+ * onenand_oob_64 - oob info for large (2KB) page
+ */
+static struct nand_ecclayout onenand_oob_64 = {
+	.eccbytes	= 20,
+	.eccpos		= {
+		8, 9, 10, 11, 12,
+		24, 25, 26, 27, 28,
+		40, 41, 42, 43, 44,
+		56, 57, 58, 59, 60,
+		},
+	.oobfree	= {
+		{2, 3}, {14, 2}, {18, 3}, {30, 2},
+		{34, 3}, {46, 2}, {50, 3}, {62, 2}
+	}
+};
+
+/**
+ * onenand_oob_32 - oob info for middle (1KB) page
+ */
+static struct nand_ecclayout onenand_oob_32 = {
+	.eccbytes	= 10,
+	.eccpos		= {
+		8, 9, 10, 11, 12,
+		24, 25, 26, 27, 28,
+		},
+	.oobfree	= { {2, 3}, {14, 2}, {18, 3}, {30, 2} }
+};
+
+
 /* It should access 16-bit instead of 8-bit */
 static inline void *memcpy_16(void *dst, const void *src, unsigned int len)
 {
@@ -269,6 +299,58 @@ static int onenand_command(struct mtd_info *mtd, int cmd, loff_t addr,
 	this->write_word(cmd, this->base + ONENAND_REG_COMMAND);
 
 	return 0;
+}
+
+/**
++ * onenand_block_checkbad - [GENERIC] Check if a block is marked bad
++ * @param mtd           MTD device structure
++ * @param ofs           offset from device start
++ * @param getchip       0, if the chip is already selected
++ * @param allowbbt      1, if its allowed to access the bbt area
++ *
++ * Check, if the block is bad. Either by reading the bad block table or
++ * calling of the scan function.
++ */
+int onenand_block_checkbad(struct mtd_info *mtd, int ofs, int getchip,
+			int allowbbt)
+{
+	struct onenand_chip *this = mtd->priv;
+	struct bbm_info *bbm = this->bbm;
+
+	/* Return info from the table */
+	return bbm->isbad_bbt(mtd, ofs, allowbbt);
+}
+
+/**
++ * onenand_default_block_markbad - [DEFAULT] mark a block bad
++ * @param mtd           MTD device structure
++ * @param ofs           offset from device start
++ *
++ * This is the default implementation, which can be overridden by
++ * a hardware specific driver.
++ */
+int onenand_default_block_markbad(struct mtd_info *mtd, loff_t ofs)
+{
+	struct onenand_chip *this = mtd->priv;
+	struct bbm_info *bbm = this->bbm;
+	u_char buf[2] = {0x0A, 0x0A};
+	int block;
+	struct mtd_oob_ops oob_ops;
+
+	/* Get block number */
+	block = ((int) ofs) >> bbm->bbt_erase_shift;
+	if (bbm->bbt)
+		bbm->bbt[block >> 2] |= 0x01 << ((block & 0x03) << 1);
+
+	/* We write two bytes, so we dont have to mess with 16 bit access */
+	ofs += mtd->oobsize + (bbm->badblockpos & ~0x01);
+	oob_ops.mode = MTD_OOB_AUTO;
+	oob_ops.len = 2;
+	oob_ops.ooblen = 2;
+	oob_ops.datbuf = NULL;
+	oob_ops.oobbuf = buf;
+	oob_ops.ooboffs = 0;
+	return onenand_write_oob(mtd, ofs, &oob_ops);
 }
 
 /**
@@ -733,6 +815,8 @@ static int onenand_read_oob_nolock(struct mtd_info *mtd, loff_t from,
 	/* Initialize return length value */
 	ops->oobretlen = 0;
 
+	stats = mtd->ecc_stats;
+
 	if (mode == MTD_OOB_AUTO)
 		oobsize = this->ecclayout->oobavail;
 	else
@@ -744,16 +828,10 @@ static int onenand_read_oob_nolock(struct mtd_info *mtd, loff_t from,
 		printk(KERN_ERR "onenand_read_oob_nolock: Attempted to start read outside oob\n");
 		return -EINVAL;
 	}
-
-	/* Do not allow reads past end of device */
-	if (unlikely(from >= mtd->size ||
-		column + len > ((mtd->size >> this->page_shift) -
-				(from >> this->page_shift)) * oobsize)) {
+	if (from >= mtd->size) {
 		printk(KERN_ERR "onenand_read_oob_nolock: Attempted to read beyond end of device\n");
 		return -EINVAL;
 	}
-
-	stats = mtd->ecc_stats;
 
 	while (read < len) {
 		thislen = oobsize - column;
@@ -790,13 +868,11 @@ static int onenand_read_oob_nolock(struct mtd_info *mtd, loff_t from,
 	}
 
 	ops->oobretlen = read;
-
 	if (ret)
 		return ret;
 
 	if (mtd->ecc_stats.failed - stats.failed)
 		return -EBADMSG;
-
 	return 0;
 }
 
@@ -1250,7 +1326,6 @@ static int onenand_write_oob_nolock(struct mtd_info *mtd, loff_t to,
 
 	/* Initialize retlen, in case of early exit */
 	ops->oobretlen = 0;
-
 	if (mode == MTD_OOB_AUTO)
 		oobsize = this->ecclayout->oobavail;
 	else
@@ -1293,6 +1368,7 @@ static int onenand_write_oob_nolock(struct mtd_info *mtd, loff_t to,
 			onenand_fill_auto_oob(mtd, oobbuf, buf, column, thislen);
 		else
 			memcpy(oobbuf + column, buf, thislen);
+
 		this->write_bufferram(mtd, ONENAND_SPARERAM, oobbuf, 0, mtd->oobsize);
 
 		this->command(mtd, ONENAND_CMD_PROGOOB, to, mtd->oobsize);
@@ -1347,6 +1423,7 @@ int onenand_write(struct mtd_info *mtd, loff_t to, size_t len,
 		.ooblen = 0,
 		.datbuf = (u_char *) buf,
 		.oobbuf = NULL,
+		.ooboffs = 0,
 	};
 	int ret;
 
@@ -1387,7 +1464,6 @@ int onenand_write_oob(struct mtd_info *mtd, loff_t to,
 	else
 		ret = onenand_write_oob_nolock(mtd, to, ops);
 	onenand_release_device(mtd);
-
 	return ret;
 
 }
@@ -1471,6 +1547,34 @@ int onenand_erase(struct mtd_info *mtd, struct erase_info *instr)
 		this->command(mtd, ONENAND_CMD_ERASE, addr, block_size);
 
 		onenand_invalidate_bufferram(mtd, addr, block_size);
+
+		if (instr->priv == ONENAND_SCRUB) {
+			if (onenand_block_isbad(mtd, addr) != 0x3) {
+				/* erase user marked bad blocks only */
+				this->command(mtd, ONENAND_CMD_ERASE,
+						addr, block_size);
+			} else {
+				/* skip the factory marked bad blocks */
+				printf("onenand_erase: not erasing\
+				factory bad blk @0x%x\n", (int)addr);
+				len -= block_size;
+				addr += block_size;
+				continue;
+			}
+		} else {
+			if (onenand_block_isbad(mtd, addr) == 0) {
+				/* block is not a known bad block. Erase it */
+				this->command(mtd, ONENAND_CMD_ERASE,\
+						addr, block_size);
+			} else {
+				/* skip the user and factory bad blocks */
+				printf("onenand_erase: not erasing\
+					bad block @0x%x\n", (int)addr);
+				len -= block_size;
+				addr += block_size;
+				continue;
+			}
+		}
 
 		ret = this->wait(mtd, FL_ERASING);
 		/* Check, if it is write protected */
@@ -1563,7 +1667,6 @@ int onenand_block_markbad(struct mtd_info *mtd, loff_t ofs)
 			return 0;
 		return ret;
 	}
-
 	ret = this->block_markbad(mtd, ofs);
 	return ret;
 }
@@ -1761,7 +1864,6 @@ static int onenand_probe(struct mtd_info *mtd)
 	this->writesize = mtd->writesize;
 
 	/* REVIST: Multichip handling */
-
 	mtd->size = this->chipsize;
 
 	/* Version ID */
@@ -1802,6 +1904,7 @@ static int onenand_probe(struct mtd_info *mtd)
  */
 int onenand_scan(struct mtd_info *mtd, int maxchips)
 {
+	unsigned int i;
 	struct onenand_chip *this = mtd->priv;
 
 	if (!this->read_word)
@@ -1818,6 +1921,45 @@ int onenand_scan(struct mtd_info *mtd, int maxchips)
 		this->read_bufferram = onenand_read_bufferram;
 	if (!this->write_bufferram)
 		this->write_bufferram = onenand_write_bufferram;
+
+	if (!this->block_markbad)
+		this->block_markbad = onenand_default_block_markbad;
+
+	/*
+	 * Allow subpage writes up to oobsize.
+	 */
+	switch (mtd->oobsize) {
+	case 64:
+		this->ecclayout = &onenand_oob_64;
+		mtd->subpage_sft = 2;
+		break;
+
+	case 32:
+		this->ecclayout = &onenand_oob_32;
+		mtd->subpage_sft = 1;
+		break;
+
+	default:
+		printk(KERN_WARNING "No OOB scheme defined for oobsize %d\n",
+			mtd->oobsize);
+		mtd->subpage_sft = 0;
+		/* To prevent kernel oops */
+		this->ecclayout = &onenand_oob_32;
+		break;
+	}
+
+	/*
+	 * The number of bytes available for a client to place data into
+	 * the out of band area
+	 */
+	this->ecclayout->oobavail = 0;
+	for (i = 0; i < MTD_MAX_OOBFREE_ENTRIES &&
+	    this->ecclayout->oobfree[i].length; i++)
+		this->ecclayout->oobavail +=
+			this->ecclayout->oobfree[i].length;
+	mtd->oobavail = this->ecclayout->oobavail;
+
+	mtd->ecclayout = this->ecclayout;
 
 	if (onenand_probe(mtd))
 		return -ENXIO;

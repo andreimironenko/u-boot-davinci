@@ -69,14 +69,16 @@ static int create_bbt(struct mtd_info *mtd, uint8_t * buf,
 	loff_t from;
 	size_t readlen, ooblen;
 	struct mtd_oob_ops ops;
+	uint8_t oobbuf[16];
 
 	printk(KERN_INFO "Scanning device for bad blocks\n");
 
-	len = 1;
+	len = 2;
 
 	/* We need only read few bytes from the OOB area */
 	scanlen = ooblen = 0;
 	readlen = bd->len;
+	scanlen = bd->len;
 
 	/* chip == -1 case only */
 	/* Note that numblocks is 2 * (real numblocks) here;
@@ -88,29 +90,27 @@ static int create_bbt(struct mtd_info *mtd, uint8_t * buf,
 
 	ops.mode = MTD_OOB_PLACE;
 	ops.ooblen = readlen;
-	ops.oobbuf = buf;
-	ops.len = ops.ooboffs = ops.retlen = ops.oobretlen = 0;
+	ops.oobbuf = &oobbuf[0] ;
+	ops.datbuf = NULL;
+	ops.len = ops.retlen = ops.oobretlen = 0;
+	ops.ooboffs = 2;
 
 	for (i = startblock; i < numblocks;) {
 		int ret;
-
 		for (j = 0; j < len; j++) {
 			/* No need to read pages fully,
-			 * just read required OOB bytes */
-			ret = onenand_bbt_read_oob(mtd,
-					     from + j * mtd->writesize +
-					     bd->offs, &ops);
-
+			* just read required OOB bytes */
+			ret = onenand_read_oob(mtd, from, &ops);
 			/* If it is a initial bad block, just ignore it */
 			if (ret == ONENAND_BBT_READ_FATAL_ERROR)
 				return -EIO;
 
 			if (ret || check_short_pattern
-			    (&buf[j * scanlen], scanlen, mtd->writesize, bd)) {
+				(ops.oobbuf, scanlen, mtd->writesize, bd)) {
 				bbm->bbt[i >> 3] |= 0x03 << (i & 0x6);
 				printk(KERN_WARNING
-				       "Bad eraseblock %d at 0x%08x\n", i >> 1,
-				       (unsigned int)from);
+					"Bad eraseblock %d at 0x%08x\n", i >> 1,
+					(unsigned int)from);
 				break;
 			}
 		}
