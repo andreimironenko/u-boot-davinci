@@ -249,11 +249,7 @@ void omap_nand_switch_ecc(int32_t hardware)
 	mtd = &nand_info[nand_curr_device];
 	nand = mtd->priv;
 
-	/* clean up allocated buffers */
-	nand_release(mtd);
-	/* Switch back to the original value, mark me unscanned */
-	nand->options = NAND_NO_PADDING | NAND_CACHEPRG | NAND_NO_AUTOINCR |
-			NAND_NO_AUTOINCR;
+	nand->options |= NAND_OWN_BUFFERS;
 
 	/* Reset ecc interface */
 	nand->ecc.read_page = NULL;
@@ -284,6 +280,8 @@ void omap_nand_switch_ecc(int32_t hardware)
 
 	/* Update NAND handling after ECC mode switch */
 	nand_scan_tail(mtd);
+
+	nand->options &= ~NAND_OWN_BUFFERS;
 }
 
 /*
