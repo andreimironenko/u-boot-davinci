@@ -310,6 +310,19 @@ void abort(void)
 {
 }
 
+/******************************************************************************
+ * Routine: print_board_info
+ * Description: Displays cpu and memory information for the board
+ *****************************************************************************/
+void print_board_info(void)
+{
+	u32 mtype, btype;
+
+	btype = get_board_type();
+
+	display_board_info(btype);
+}
+
 #ifdef CONFIG_NAND_OMAP_GPMC
 /******************************************************************************
  * OMAP3 specific command to switch between NAND HW and SW ecc

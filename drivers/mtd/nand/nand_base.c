@@ -542,6 +542,7 @@ static void nand_command(struct mtd_info *mtd, unsigned int command,
 			column -= 256;
 			readcmd = NAND_CMD_READ1;
 		}
+
 		chip->cmd_ctrl(mtd, readcmd, ctrl);
 		ctrl &= ~NAND_CTRL_CHANGE;
 	}
@@ -2641,7 +2642,6 @@ int nand_scan_ident(struct mtd_info *mtd, int maxchips)
 	/* Store the number of chips and calc total size for mtd */
 	chip->numchips = i;
 	mtd->size = i * chip->chipsize;
-
 	return 0;
 }
 

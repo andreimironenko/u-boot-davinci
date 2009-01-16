@@ -90,11 +90,9 @@ int do_onenand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 
 				start >>= onenand_chip.erase_shift;
 				end >>= onenand_chip.erase_shift;
-				/* Don't include the end block */
-				end--;
 			}
 
-			if (!end || (end < start)) {
+			if (end < start) {
 				printf("Error : erase failed ");
 				printf("end address incorrect\n");
 				break;

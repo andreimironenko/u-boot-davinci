@@ -39,11 +39,19 @@ extern uchar default_environment[];
 
 #define ONENAND_ENV_SIZE(mtd)	(mtd.writesize - ENV_HEADER_SIZE)
 
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+char *onenand_env_name_spec = "OneNAND";
+#else
 char *env_name_spec = "OneNAND";
+#endif
 
 #ifdef ENV_IS_EMBEDDED
 extern uchar environment[];
 env_t *env_ptr = (env_t *) (&environment[0]);
+#elif defined(CONFIG_ENV_IS_RUNTIME_SEL)
+static unsigned char onenand_env[MAX_ONENAND_PAGESIZE];
+env_t *onenand_env_ptr = (env_t *)&onenand_env[0];
+extern env_t *env_ptr;
 #else /* ! ENV_IS_EMBEDDED */
 static unsigned char onenand_env[MAX_ONENAND_PAGESIZE];
 env_t *env_ptr = (env_t *) onenand_env;
@@ -51,12 +59,20 @@ env_t *env_ptr = (env_t *) onenand_env;
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+uchar onenand_env_get_char_spec(int index)
+#else
 uchar env_get_char_spec(int index)
+#endif
 {
 	return (*((uchar *) (gd->env_addr + index)));
 }
 
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+void onenand_env_relocate_spec(void)
+#else
 void env_relocate_spec(void)
+#endif
 {
 	unsigned long env_addr;
 	int use_default = 0;
@@ -87,7 +103,11 @@ void env_relocate_spec(void)
 	gd->env_valid = 1;
 }
 
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+int onenand_saveenv(void)
+#else
 int saveenv(void)
+#endif
 {
 	unsigned long env_addr = CONFIG_ENV_ADDR;
 	struct erase_info instr = {
@@ -101,7 +121,6 @@ int saveenv(void)
 		printf("OneNAND: erase failed at 0x%08lx\n", env_addr);
 		return 1;
 	}
-
 	/* update crc */
 	env_ptr->crc =
 	    crc32(0, env_ptr->data, ONENAND_ENV_SIZE(onenand_mtd));
@@ -111,11 +130,14 @@ int saveenv(void)
 		printf("OneNAND: write failed at 0x%08x\n", instr.addr);
 		return 2;
 	}
-
 	return 0;
 }
 
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+int onenand_env_init(void)
+#else
 int env_init(void)
+#endif
 {
 	/* use default */
 	gd->env_addr = (ulong) & default_environment[0];

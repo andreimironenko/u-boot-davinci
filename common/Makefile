@@ -58,6 +58,7 @@ COBJS-$(CONFIG_ENV_IS_IN_NVRAM) += env_nvram.o
 COBJS-$(CONFIG_ENV_IS_IN_ONENAND) += env_onenand.o
 COBJS-$(CONFIG_ENV_IS_IN_SPI_FLASH) += env_sf.o
 COBJS-$(CONFIG_ENV_IS_NOWHERE) += env_nowhere.o
+COBJS-$(CONFIG_ENV_IS_RUNTIME_SEL) += env_onenand.o env_nand.o
 
 # command
 COBJS-$(CONFIG_CMD_AMBAPP) += cmd_ambapp.o

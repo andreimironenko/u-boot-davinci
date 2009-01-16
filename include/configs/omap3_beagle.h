@@ -283,6 +283,7 @@
 #define CONFIG_SYS_JFFS2_NUM_BANKS	1
 
 #define ENV_IS_VARIABLE		1
+#define CONFIG_ENV_IS_RUNTIME_SEL	1
 
 #ifndef __ASSEMBLY__
 extern unsigned int *nand_cs_base;

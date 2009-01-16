@@ -59,6 +59,11 @@ DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
 
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+extern void gpmc_init(void);
+extern void print_board_info(void);
+#endif
+
 #ifdef CONFIG_HAS_DATAFLASH
 extern int  AT91F_DataflashInit(void);
 extern void dataflash_print_info(void);
@@ -246,12 +251,17 @@ static int init_func_i2c (void)
 typedef int (init_fnc_t) (void);
 
 int print_cpuinfo (void); /* test-only */
+extern env_init_p env_init;
 
 init_fnc_t *init_sequence[] = {
 	cpu_init,		/* basic cpu dependent setup */
 	board_init,		/* basic board dependent setup */
 	interrupt_init,		/* set up exceptions */
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+	NULL,			/* initialize environment */
+#else
 	env_init,		/* initialize environment */
+#endif
 	init_baudrate,		/* initialze baudrate settings */
 	serial_init,		/* serial communications setup */
 	console_init_f,		/* stage 1 init of console */
@@ -338,13 +348,14 @@ void start_armboot (void)
 	/* armboot_start is defined in the board-specific linker script */
 	mem_malloc_init (_armboot_start - CONFIG_SYS_MALLOC_LEN);
 
-#if defined(CONFIG_CMD_NAND)
-	puts ("NAND:  ");
-	nand_init();		/* go init the NAND */
-#endif
-
-#if defined(CONFIG_CMD_ONENAND)
-	onenand_init();
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+	gpmc_init(); /* in SRAM or SDRAM, finish GPMC */
+	env_init();
+	init_baudrate();        /* initialze baudrate settings */
+	serial_init();          /* serial communications setup */
+	console_init_f();       /* stage 1 init of console */
+	display_banner();
+	print_board_info();
 #endif
 
 #ifdef CONFIG_HAS_DATAFLASH

@@ -243,12 +243,20 @@ extern ulong load_addr;		/* Default Load Address */
 void	doc_probe(unsigned long physadr);
 
 /* common/cmd_nvedit.c */
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+typedef uchar (*env_get_char_spec_p)(int index);
+typedef int (*env_init_p)(void);
+typedef int (*saveenv_p)(void);
+typedef void (*env_relocate_spec_p)(void);
+#else
 int	env_init     (void);
+int     saveenv(void);
+#endif
 void	env_relocate (void);
 int	envmatch     (uchar *, int);
 char	*getenv	     (char *);
 int	getenv_r     (char *name, char *buf, unsigned len);
-int	saveenv	     (void);
+
 #ifdef CONFIG_PPC		/* ARM version to be fixed! */
 int inline setenv   (char *, char *);
 #else

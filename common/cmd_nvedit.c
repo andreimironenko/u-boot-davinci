@@ -59,12 +59,17 @@ DECLARE_GLOBAL_DATA_PTR;
     !defined(CONFIG_ENV_IS_IN_NAND)	&& \
     !defined(CONFIG_ENV_IS_IN_ONENAND)	&& \
     !defined(CONFIG_ENV_IS_IN_SPI_FLASH)	&& \
+    !defined(CONFIG_ENV_IS_RUNTIME_SEL)	&& \
     !defined(CONFIG_ENV_IS_NOWHERE)
 # error Define one of CONFIG_ENV_IS_IN_{NVRAM|EEPROM|FLASH|DATAFLASH|ONENAND|SPI_FLASH|NOWHERE}
 #endif
 
 #define XMK_STR(x)	#x
 #define MK_STR(x)	XMK_STR(x)
+
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+extern saveenv_p saveenv;
+#endif
 
 /************************************************************************
 ************************************************************************/

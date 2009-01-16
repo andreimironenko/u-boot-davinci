@@ -48,6 +48,7 @@ static void setup_net_chip(void);
  * M0   - Mode 0
  * The commented string gives the final mux configuration for that pin
  */
+
 #define MUX_EVM() \
  /*SDRC*/\
  MUX_VAL(CP(SDRC_D0),		(IEN  | PTD | DIS | M0)) /*SDRC_D0*/\
@@ -217,10 +218,10 @@ static void setup_net_chip(void);
  MUX_VAL(CP(MMC2_DAT6),		(IDIS | PTD | DIS | M0)) /*MMC2_DAT6 */\
  MUX_VAL(CP(MMC2_DAT7),		(IEN  | PTU | EN  | M0)) /*MMC2_DAT7*/\
  /*Bluetooth*/\
- MUX_VAL(CP(MCBSP3_DX),		(IDIS | PTD | DIS | M0)) /*McBSP3_DX*/\
- MUX_VAL(CP(MCBSP3_DR),		(IEN  | PTD | DIS | M0)) /*McBSP3_DR*/\
- MUX_VAL(CP(MCBSP3_CLKX),	(IEN  | PTD | DIS | M0)) /*McBSP3_CLKX  */\
- MUX_VAL(CP(MCBSP3_FSX),	(IEN  | PTD | DIS | M0)) /*McBSP3_FSX*/\
+ MUX_VAL(CP(MCBSP3_DX),		(IDIS | PTD | DIS | M4)) /*McBSP3_DX*/\
+ MUX_VAL(CP(MCBSP3_DR),		(IEN  | PTD | DIS | M4)) /*McBSP3_DR*/\
+ MUX_VAL(CP(MCBSP3_CLKX),	(IEN  | PTD | DIS | M4)) /*McBSP3_CLKX  */\
+ MUX_VAL(CP(MCBSP3_FSX),	(IEN  | PTD | DIS | M4)) /*McBSP3_FSX*/\
  MUX_VAL(CP(UART2_CTS),		(IEN  | PTU | EN  | M0)) /*UART2_CTS*/\
  MUX_VAL(CP(UART2_RTS),		(IDIS | PTD | DIS | M0)) /*UART2_RTS*/\
  MUX_VAL(CP(UART2_TX),		(IDIS | PTD | DIS | M0)) /*UART2_TX*/\
@@ -289,7 +290,7 @@ static void setup_net_chip(void);
  /*Control and debug */\
  MUX_VAL(CP(SYS_32K),		(IEN  | PTD | DIS | M0)) /*SYS_32K*/\
  MUX_VAL(CP(SYS_CLKREQ),	(IEN  | PTD | DIS | M0)) /*SYS_CLKREQ*/\
- MUX_VAL(CP(SYS_NIRQ),		(IEN  | PTU | EN  | M0)) /*SYS_nIRQ*/\
+ MUX_VAL(CP(SYS_NIRQ),		(IEN  | PTU | EN  | M4)) /*SYS_nIRQ*/\
  MUX_VAL(CP(SYS_BOOT0),		(IEN  | PTD | DIS | M4)) /*GPIO_2*/\
 							 /* - PEN_IRQ */\
  MUX_VAL(CP(SYS_BOOT1),		(IEN  | PTD | DIS | M4)) /*GPIO_3 */\
@@ -299,7 +300,7 @@ static void setup_net_chip(void);
  MUX_VAL(CP(SYS_BOOT5),		(IEN  | PTD | DIS | M4)) /*GPIO_7*/\
  MUX_VAL(CP(SYS_BOOT6),		(IDIS | PTD | DIS | M4)) /*GPIO_8*/\
 							 /* - VIO_1V8*/\
- MUX_VAL(CP(SYS_OFF_MODE),	(IEN  | PTD | DIS | M0)) /*SYS_OFF_MODE*/\
+ MUX_VAL(CP(SYS_OFF_MODE),	(IEN  | PTD | DIS | M4)) /*SYS_OFF_MODE*/\
  MUX_VAL(CP(SYS_CLKOUT1),	(IEN  | PTD | DIS | M0)) /*SYS_CLKOUT1*/\
  MUX_VAL(CP(SYS_CLKOUT2),	(IEN  | PTU | EN  | M0)) /*SYS_CLKOUT2*/\
  MUX_VAL(CP(JTAG_nTRST),	(IEN  | PTD | DIS | M0)) /*JTAG_nTRST*/\

@@ -34,6 +34,14 @@
 extern omap3_sysinfo sysinfo;
 static u32 *gpmc_base = (u32 *)GPMC_BASE;
 
+#if defined(CONFIG_CMD_NAND)
+extern u8 is_nand;
+#endif
+
+#if defined(CONFIG_CMD_ONENAND)
+extern u8 is_onenand;
+#endif
+
 /******************************************
  * get_cpu_rev(void) - extract version info
  ******************************************/
@@ -179,9 +187,22 @@ void display_board_info(u32 btype)
 	}
 
 	printf("OMAP%s-%s rev %d, CPU-OPP2 L3-165MHz\n", sysinfo.cpu_string,
-	       sec_s, get_cpu_rev());
+		sec_s, get_cpu_rev());
+#if defined(CONFIG_ENV_IS_RUNTIME_SEL)
+	printf("%s + %s/", sysinfo.board_string,
+		mem_s);
+#if defined(CONFIG_CMD_NAND)
+	if (is_nand)
+		printf("%s\n", "NAND");
+#endif
+#if defined(CONFIG_CMD_ONENAND)
+	if (is_onenand)
+		printf("%s\n", "ONENAND");
+#endif
+#else
 	printf("%s + %s/%s\n", sysinfo.board_string,
-	       mem_s, sysinfo.nand_string);
+		mem_s, sysinfo.nand_string);
+#endif
 
 }
 
