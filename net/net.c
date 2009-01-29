@@ -259,7 +259,7 @@ void ArpTimeoutCheck(void)
 	t = get_timer(0);
 
 	/* check for arp timeout */
-	if ((t - NetArpWaitTimerStart) > ARP_TIMEOUT) {
+	if ((t - NetArpWaitTimerStart) > ARP_TIMEOUT * CONFIG_SYS_HZ/10) {
 		NetArpWaitTry++;
 
 		if (NetArpWaitTry >= ARP_TIMEOUT_COUNT) {
@@ -597,8 +597,8 @@ void NetStartAgain (void)
 		return;
 	}
 #ifndef CONFIG_NET_MULTI
-	NetSetTimeout (10000UL, startAgainTimeout);
-	NetSetHandler (startAgainHandler);
+	NetSetTimeout(10UL * CONFIG_SYS_HZ, startAgainTimeout);
+	NetSetHandler(startAgainHandler);
 #else	/* !CONFIG_NET_MULTI*/
 	eth_halt ();
 #if !defined(CONFIG_NET_DO_NOT_TRY_ANOTHER)
@@ -608,8 +608,8 @@ void NetStartAgain (void)
 	if (NetRestartWrap) {
 		NetRestartWrap = 0;
 		if (NetDevExists && !once) {
-			NetSetTimeout (10000UL, startAgainTimeout);
-			NetSetHandler (startAgainHandler);
+			NetSetTimeout(10UL * CONFIG_SYS_HZ, startAgainTimeout);
+			NetSetHandler(startAgainHandler);
 		} else {
 			NetState = NETLOOP_FAIL;
 		}
@@ -784,8 +784,8 @@ static void PingStart(void)
 #if defined(CONFIG_NET_MULTI)
 	printf ("Using %s device\n", eth_get_name());
 #endif	/* CONFIG_NET_MULTI */
-	NetSetTimeout (10000UL, PingTimeout);
-	NetSetHandler (PingHandler);
+	NetSetTimeout(10UL * CONFIG_SYS_HZ, PingTimeout);
+	NetSetHandler(PingHandler);
 
 	PingSend();
 }
@@ -807,7 +807,7 @@ static void PingStart(void)
 #define CDP_SYSOBJECT_TLV		0x0015
 #define CDP_MANAGEMENT_ADDRESS_TLV	0x0016
 
-#define CDP_TIMEOUT			250UL	/* one packet every 250ms */
+#define CDP_TIMEOUT			(CONFIG_SYS_HZ/4)
 
 static int CDPSeq;
 static int CDPOK;

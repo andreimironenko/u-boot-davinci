@@ -14,7 +14,7 @@
 
 #if defined(CONFIG_CMD_NET) && defined(CONFIG_CMD_SNTP)
 
-#define SNTP_TIMEOUT 10000UL
+#define SNTP_TIMEOUT 10UL
 
 static int SntpOurPort;
 
@@ -82,7 +82,7 @@ SntpStart (void)
 {
 	debug ("%s\n", __FUNCTION__);
 
-	NetSetTimeout (SNTP_TIMEOUT, SntpTimeout);
+	NetSetTimeout(SNTP_TIMEOUT * CONFIG_SYS_HZ, SntpTimeout);
 	NetSetHandler(SntpHandler);
 	memset (NetServerEther, 0, 6);
 

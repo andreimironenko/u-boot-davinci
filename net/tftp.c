@@ -15,7 +15,7 @@
 #if defined(CONFIG_CMD_NET)
 
 #define WELL_KNOWN_PORT	69		/* Well known TFTP port #		*/
-#define TIMEOUT		5000UL		/* Millisecs to timeout for lost pkt */
+#define TIMEOUT		5UL	/* Millisecs to timeout for lost pkt */
 #ifndef	CONFIG_NET_RETRY_COUNT
 # define TIMEOUT_COUNT	10		/* # of timeouts before giving up  */
 #else
@@ -387,7 +387,7 @@ TftpHandler (uchar * pkt, unsigned dest, unsigned src, unsigned len)
 		TftpLastBlock = TftpBlock;
 		TftpTimeoutMSecs = TIMEOUT;
 		TftpTimeoutCountMax = TIMEOUT_COUNT;
-		NetSetTimeout (TftpTimeoutMSecs, TftpTimeout);
+		NetSetTimeout(TIMEOUT * CONFIG_SYS_HZ, TftpTimeout);
 
 		store_block (TftpBlock - 1, pkt + 2, len);
 
@@ -466,7 +466,7 @@ TftpTimeout (void)
 		NetStartAgain ();
 	} else {
 		puts ("T ");
-		NetSetTimeout (TftpTimeoutMSecs, TftpTimeout);
+		NetSetTimeout(TIMEOUT * CONFIG_SYS_HZ, TftpTimeout);
 		TftpSend ();
 	}
 }
@@ -540,7 +540,7 @@ TftpStart (void)
 	TftpTimeoutMSecs = TftpRRQTimeoutMSecs;
 	TftpTimeoutCountMax = TftpRRQTimeoutCountMax;
 
-	NetSetTimeout (TftpTimeoutMSecs, TftpTimeout);
+	NetSetTimeout(TIMEOUT * CONFIG_SYS_HZ, TftpTimeout);
 	NetSetHandler (TftpHandler);
 
 	TftpServerPort = WELL_KNOWN_PORT;

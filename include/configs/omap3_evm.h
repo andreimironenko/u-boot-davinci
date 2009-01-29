@@ -214,6 +214,7 @@
 #define CONFIG_SYS_PVT			V_PVT	/* 2^(pvt+1) */
 #define CONFIG_SYS_HZ			((V_SCLK) / (2 << CONFIG_SYS_PVT))
 
+#define CFG_HZ	CONFIG_SYS_HZ
 /*-----------------------------------------------------------------------
  * Stack sizes
  *

@@ -57,11 +57,6 @@ static inline void reg_write(u32 addr, u32 val)
 #error "SMC911X: undefined bus width"
 #endif /* CONFIG_DRIVER_SMC911X_16_BIT */
 
-u32 pkt_data_pull(u32 addr) \
-	__attribute__ ((weak, alias ("reg_read")));
-void pkt_data_push(u32 addr, u32 val) \
-	__attribute__ ((weak, alias ("reg_write")));
-
 #define mdelay(n)       udelay((n)*1000)
 
 /* Below are the register offsets and bit definitions
@@ -646,7 +641,7 @@ int eth_send(volatile void *packet, int length)
 	tmplen = (length + 3) / 4;
 
 	while (tmplen--)
-		pkt_data_push(TX_DATA_FIFO, *data++);
+		reg_write(TX_DATA_FIFO, *data++);
 
 	/* wait for transmission */
 	while (!((reg_read(TX_FIFO_INF) & TX_FIFO_INF_TSUSED) >> 16));
@@ -689,7 +684,7 @@ int eth_rx(void)
 
 		tmplen = (pktlen + 2+ 3) / 4;
 		while (tmplen--)
-			*data++ = pkt_data_pull(RX_DATA_FIFO);
+			*data++ = reg_read(RX_DATA_FIFO);
 
 		if (status & RX_STS_ES)
 			printf(DRIVERNAME
