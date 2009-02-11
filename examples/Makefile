@@ -36,7 +36,11 @@ else
 ifeq ($(CPU),omap3)
 LOAD_ADDR = 0x80300000
 else
+ifeq ($(CPU),arm_cortexa8)
+LOAD_ADDR = 0x80300000
+else
 LOAD_ADDR = 0xc100000
+endif
 endif
 endif
 endif
