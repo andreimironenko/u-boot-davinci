@@ -92,8 +92,7 @@ static int create_bbt(struct mtd_info *mtd, uint8_t * buf,
 	ops.ooblen = readlen;
 	ops.oobbuf = &oobbuf[0] ;
 	ops.datbuf = NULL;
-	ops.len = ops.retlen = ops.oobretlen = 0;
-	ops.ooboffs = 2;
+	ops.len = ops.retlen = ops.oobretlen = ops.ooboffs = 0;
 
 	for (i = startblock; i < numblocks;) {
 		int ret;
