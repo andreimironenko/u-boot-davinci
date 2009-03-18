@@ -195,7 +195,7 @@ TftpSend (void)
 		pkt += 5 /*strlen("octet")*/ + 1;
 		strcpy ((char *)pkt, "timeout");
 		pkt += 7 /*strlen("timeout")*/ + 1;
-		sprintf((char *)pkt, "%lu", TIMEOUT / 1000);
+		sprintf((char *)pkt, "%lu", TIMEOUT);
 #ifdef ET_DEBUG
 		printf("send option \"timeout %s\"\n", (char *)pkt);
 #endif
