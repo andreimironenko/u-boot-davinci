@@ -169,7 +169,16 @@ static ulong timestamp;
 static ulong lastinc;
 static gptimer_t *timer_base = (gptimer_t *)CONFIG_SYS_TIMERBASE;
 
-/* nothing really to do with interrupts, just starts up a counter. */
+/*
+ * Nothing really to do with interrupts, just starts up a counter.
+ * We run the counter with 13MHz, divided by 8, resulting in timer
+ * frequency of 1.625MHz. With 32bit counter register, counter
+ * overflows in ~44min
+ */
+
+/* 13MHz / 8 = 1.625MHz */
+#define TIMER_CLOCK	(V_SCLK / (2 << CONFIG_SYS_PVT))
+
 int interrupt_init(void)
 {
 	/* start the counter ticking up, reload value on overflow */
@@ -204,76 +213,36 @@ void set_timer(ulong t)
 /* delay x useconds AND perserve advance timstamp value */
 void udelay(unsigned long usec)
 {
-	ulong tmo, tmp;
+	ulong tmo, endtime;
 
-	/* if "big" number, spread normalization to seconds */
-	if (usec >= 1000) {
-		/* if "big" number, spread normalization to seconds */
-		tmo = usec / 1000;
-		/* find number of "ticks" to wait to achieve target */
-		tmo *= CONFIG_SYS_HZ;
-		tmo /= 1000;	/* finish normalize. */
-	} else {/* else small number, don't kill it prior to HZ multiply */
-		tmo = usec * CONFIG_SYS_HZ;
-		tmo /= (1000 * 1000);
-	}
+	tmo = usec * (TIMER_CLOCK / CONFIG_SYS_HZ);
+	tmo /= 1000;
 
-	tmp = get_timer(0);	/* get current timestamp */
-	/* if setting this forward will roll time stamp */
-	if ((tmo + tmp + 1) < tmp)
-		/* reset "advancing" timestamp to 0, set lastinc value */
-		reset_timer_masked();
-	else
-		tmo += tmp;	/* else, set advancing stamp wake up time */
-	while (get_timer_masked() < tmo)	/* loop till event */
-		 /*NOP*/;
+	endtime = readl(&timer_base->tcrr) + tmo;
+
+	while (readl(&timer_base->tcrr) < endtime);
 }
 
 void reset_timer_masked(void)
 {
 	/* reset time, capture current incrementer value time */
-	lastinc = readl(&timer_base->tcrr);
+	lastinc = readl(&timer_base->tcrr) / (TIMER_CLOCK / CONFIG_SYS_HZ);
 	timestamp = 0;		/* start "advancing" time stamp from 0 */
 }
 
 ulong get_timer_masked(void)
 {
-	ulong now = readl(&timer_base->tcrr); /* current tick value */
+	/* current tick value */
+	ulong now = readl(&timer_base->tcrr) / (TIMER_CLOCK / CONFIG_SYS_HZ);
 
 	if (now >= lastinc)	/* normal mode (non roll) */
 		/* move stamp fordward with absoulte diff ticks */
 		timestamp += (now - lastinc);
 	else	/* we have rollover of incrementer */
-		timestamp += (0xFFFFFFFF - lastinc) + now;
+		timestamp += ((0xFFFFFFFF / (TIMER_CLOCK / CONFIG_SYS_HZ))
+				- lastinc) + now;
 	lastinc = now;
 	return timestamp;
-}
-
-/* waits specified delay value and resets timestamp */
-void udelay_masked(unsigned long usec)
-{
-	ulong tmo;
-	ulong endtime;
-	signed long diff;
-
-	/* if "big" number, spread normalization to seconds */
-	if (usec >= 1000) {
-		/* start to normalize for usec to ticks per sec */
-		tmo = usec / 1000;
-		/* find number of "ticks" to wait to achieve target */
-		tmo *= CONFIG_SYS_HZ;
-		tmo /= 1000;	/* finish normalize. */
-	} else {		/* else small number, */
-				/* don't kill it prior to HZ multiply */
-		tmo = usec * CONFIG_SYS_HZ;
-		tmo /= (1000 * 1000);
-	}
-	endtime = get_timer_masked() + tmo;
-
-	do {
-		ulong now = get_timer_masked();
-		diff = endtime - now;
-	} while (diff >= 0);
 }
 
 /*
@@ -291,7 +260,5 @@ unsigned long long get_ticks(void)
  */
 ulong get_tbclk(void)
 {
-	ulong tbclk;
-	tbclk = CONFIG_SYS_HZ;
-	return tbclk;
+	return CONFIG_SYS_HZ;
 }
