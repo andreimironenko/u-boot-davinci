@@ -56,6 +56,8 @@ static int davinci_eth_close (void);
 static int davinci_eth_send_packet (volatile void *packet, int length);
 static int davinci_eth_rcv_packet (void);
 static void davinci_eth_mdio_enable(void);
+static int mdio_read(int phy_addr, int reg_num);
+void mdio_write(int phy_addr, int reg_num, unsigned int data);
 
 static int gen_init_phy(int phy_addr);
 static int gen_is_phy_connected(int phy_addr);
@@ -142,6 +144,31 @@ static void davinci_eth_mdio_enable(void)
 		MDIO_CONTROL_FAULT_ENABLE;
 
 	while (adap_mdio->CONTROL & MDIO_CONTROL_IDLE) {;}
+}
+
+/* Read a PHY register via MDIO inteface */
+static int mdio_read(int phy_addr, int reg_num)
+{
+    adap_mdio->USERACCESS0 = MDIO_USERACCESS0_GO | MDIO_USERACCESS0_WRITE_READ | 
+                             ((reg_num & 0x1F) << 21) | 
+                             ((phy_addr & 0x1F) << 16);
+
+    /* Wait for command to complete */ 
+    while ((adap_mdio->USERACCESS0 & MDIO_USERACCESS0_GO) != 0);    
+
+    return (adap_mdio->USERACCESS0 & 0xFFFF);
+}
+
+/* Write to a PHY register via MDIO inteface */
+void mdio_write(int phy_addr, int reg_num, unsigned int data)
+{
+    /* Wait for User access register to be ready */
+    while ((adap_mdio->USERACCESS0 & MDIO_USERACCESS0_GO) != 0);    
+    
+    adap_mdio->USERACCESS0 = MDIO_USERACCESS0_GO | MDIO_USERACCESS0_WRITE_WRITE | 
+                             ((reg_num & 0x1F) << 21) | 
+                             ((phy_addr & 0x1F) << 16) |
+                             (data & 0xFFFF);
 }
 
 /*
@@ -291,6 +318,28 @@ int davinci_eth_miiphy_initialize(bd_t *bis)
 }
 #endif
 
+static void emac_gigabit_enable(void)
+{
+	int temp;
+
+	temp = mdio_read(EMAC_MDIO_PHY_NUM, 0);
+
+	if(temp & (1 << 6)) {		/* Check if link detected is giga-bit */
+		/* Gigabit mode detected. enable gigbit in MAC and PHY */
+		adap_emac->MACCONTROL |= EMAC_MACCONTROL_GIGFORCE | EMAC_MACCONTROL_GIGABIT_ENABLE;
+
+		/* Porting Alert: This register is specific to the Agere PHY present
+		 * on DM6467 EVM */
+		/* The SYS_CLK which feeds the 125MHz to DM6467 for giga-bit operation
+		 * does not seem to be enabled after reset as expected. Force enabling
+		 * SYS_CLK by writing to the PHY 
+		 */
+		temp = mdio_read(EMAC_MDIO_PHY_NUM, 22);	
+		temp |= (1 << 4);
+		mdio_write(EMAC_MDIO_PHY_NUM, 22, temp);
+	}
+}
+
 /*
  * This function initializes the emac hardware. It does NOT initialize
  * EMAC modules power or pin multiplexors, that is done by board_init()
@@ -375,10 +424,15 @@ static int davinci_eth_open(void)
 	/* Reset EMAC module and disable interrupts in wrapper */
 	adap_emac->SOFTRESET = 1;
 	while (adap_emac->SOFTRESET != 0) {;}
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)
+	adap_ewrap->SOFTRST = 1;
+    	while (adap_ewrap->SOFTRST != 0);
+#else
 	adap_ewrap->EWCTL = 0;
 	for (cnt = 0; cnt < 5; cnt++) {
 		clkdiv = adap_ewrap->EWCTL;
 	}
+#endif
 
 	rx_desc = emac_rx_desc;
 
@@ -393,13 +447,19 @@ static int davinci_eth_open(void)
 		(davinci_eth_mac_addr[2] << 16) |
 		(davinci_eth_mac_addr[1] << 8)  |
 		(davinci_eth_mac_addr[0]);
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)
+	adap_emac->MACADDRLO = 
+		((davinci_eth_mac_addr[5] << 8) | davinci_eth_mac_addr[4] | (0<<16)|(1<<19) |(1<<20));
+#else
 	adap_emac->MACADDRLO =
 		(davinci_eth_mac_addr[5] << 8) |
 		(davinci_eth_mac_addr[4]);
+#endif
 
 	adap_emac->MACHASH1 = 0;
 	adap_emac->MACHASH2 = 0;
 
+#if !defined(CFG_DM6467_EVM) && !defined(CFG_DM365_EVM)
 	/* Set source MAC address - REQUIRED */
 	adap_emac->MACSRCADDRHI =
 		(davinci_eth_mac_addr[3] << 24) |
@@ -409,6 +469,7 @@ static int davinci_eth_open(void)
 	adap_emac->MACSRCADDRLO =
 		(davinci_eth_mac_addr[4] << 8) |
 		(davinci_eth_mac_addr[5]);
+#endif
 
 	/* Set DMA 8 TX / 8 RX Head pointers to 0 */
 	addr = &adap_emac->TX0HDP;
@@ -460,9 +521,18 @@ static int davinci_eth_open(void)
 	/* Init MDIO & get link state */
 	clkdiv = (EMAC_MDIO_BUS_FREQ / EMAC_MDIO_CLOCK_FREQ) - 1;
 	adap_mdio->CONTROL = ((clkdiv & 0xff) | MDIO_CONTROL_ENABLE | MDIO_CONTROL_FAULT);
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)
+	udelay(1000);
+#endif
 
 	if (!phy.get_link_speed(active_phy_addr))
 		return(0);
+	else {
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)	
+		emac_gigabit_enable();
+#endif
+	}
+
 
 	/* Start receive process */
 	adap_emac->RX0HDP = (u_int32_t)emac_rx_desc;
@@ -525,7 +595,11 @@ static int davinci_eth_close(void)
 
 	/* Reset EMAC module and disable interrupts in wrapper */
 	adap_emac->SOFTRESET = 1;
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)
+	adap_ewrap->SOFTRST = 1;	
+#else
 	adap_ewrap->EWCTL = 0;
+#endif
 
 	debug_emac("- emac_close\n");
 	return(1);
@@ -547,6 +621,11 @@ static int davinci_eth_send_packet (volatile void *packet, int length)
 	if (!phy.get_link_speed (active_phy_addr)) {
 		printf ("WARN: emac_send_packet: No link\n");
 		return (ret_status);
+	}
+	else {	
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)
+		emac_gigabit_enable();	
+#endif		
 	}
 
 	/* Check packet size and if < EMAC_MIN_ETHERNET_PKT_SIZE, pad it up */
@@ -570,6 +649,11 @@ static int davinci_eth_send_packet (volatile void *packet, int length)
 		if (!phy.get_link_speed (active_phy_addr)) {
 			davinci_eth_ch_teardown (EMAC_CH_TX);
 			return (ret_status);
+		}
+		else {	
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM)
+			emac_gigabit_enable();
+#endif		
 		}
 		if (adap_emac->TXINTSTATRAW & 0x01) {
 			ret_status = length;
