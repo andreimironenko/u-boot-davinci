@@ -190,8 +190,9 @@ static int read_bbt(struct mtd_info *mtd, uint8_t *buf, int page, int num,
 				}
 				/* Leave it for now, if its matured we can move this
 				 * message to MTD_DEBUG_LEVEL0 */
+				/* Reduce boot time
 				printk(KERN_DEBUG "nand_read_bbt: Bad block at 0x%08x\n",
-				       ((offs << 2) + (act >> 1)) << this->bbt_erase_shift);
+				       ((offs << 2) + (act >> 1)) << this->bbt_erase_shift);*/
 				/* Factory marked bad or worn out ? */
 				if (tmp == 0)
 					this->bbt[offs + (act >> 3)] |= 0x3 << (act & 0x06);
@@ -737,6 +738,7 @@ static int write_bbt(struct mtd_info *mtd, uint8_t *buf,
 		if (res < 0)
 			goto outerr;
 
+		udelay(100000);
 		res = scan_write_bbt(mtd, to, len, buf, &buf[len]);
 		if (res < 0)
 			goto outerr;
@@ -976,6 +978,8 @@ int nand_scan_bbt(struct mtd_info *mtd, struct nand_bbt_descr *bd)
 		printk(KERN_ERR "nand_scan_bbt: Out of memory\n");
 		return -ENOMEM;
 	}
+	/* Clear the memory bad block table */
+	memset(this->bbt, 0x00, len);
 
 	/* If no primary table decriptor is given, scan the device
 	 * to build a memory based bad block table
@@ -1012,6 +1016,7 @@ int nand_scan_bbt(struct mtd_info *mtd, struct nand_bbt_descr *bd)
 		res = check_create(mtd, buf, bd);
 
 	/* Prevent the bbt regions from erasing / writing */
+
 	mark_bbt_region(mtd, td);
 	if (md)
 		mark_bbt_region(mtd, md);
@@ -1106,7 +1111,7 @@ static struct nand_bbt_descr smallpage_flashbased = {
 };
 
 static struct nand_bbt_descr largepage_flashbased = {
-	.options = NAND_BBT_SCAN2NDPAGE,
+	.options = 0,/*NAND_BBT_SCAN2NDPAGE,*/
 	.offs = 0,
 	.len = 2,
 	.pattern = scan_ff_pattern
