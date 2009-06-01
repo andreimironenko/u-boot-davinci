@@ -60,6 +60,7 @@
 #define CONFIG_SYS_TIMERBASE		0x01c21400	/* use timer 0 */
 #define CONFIG_SYS_HZ_CLOCK		27000000	/* Timer Input clock freq */
 #define CONFIG_SYS_HZ			1000
+#define CONFIG_SOC_DM644X
 /*====================================================*/
 /* EEPROM definitions for Atmel 24C256BN SEEPROM chip */
 /* on Sonata/DV_EVM board. No EEPROM on schmoogie.    */
@@ -128,6 +129,8 @@
 #define CONFIG_SYS_NAND_BASE		0x02000000
 #define CONFIG_SYS_NAND_HW_ECC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1	/* Max number of NAND devices */
+#define	CONFIG_MASK_CLE			0x10
+#define	CONFIG_MASK_ALE			0x08
 #define CONFIG_ENV_OFFSET		0x0	/* Block 0--not used by bootcode */
 #define DEF_BOOTM		""
 #elif defined(CONFIG_SYS_USE_NOR)
