@@ -38,15 +38,38 @@
 
 #include <asm/arch/hardware.h>
 
+#ifdef CFG_DM365_EVM
+#define EMAC_BASE_ADDR			(0x01d07000)
+#define EMAC_WRAPPER_BASE_ADDR		(0x01d0a000)
+#define EMAC_WRAPPER_RAM_ADDR		(0x01d08000)
+#define EMAC_MDIO_BASE_ADDR		(0x01d0b000)
+#else
 #define EMAC_BASE_ADDR			(0x01c80000)
 #define EMAC_WRAPPER_BASE_ADDR		(0x01c81000)
 #define EMAC_WRAPPER_RAM_ADDR		(0x01c82000)
 #define EMAC_MDIO_BASE_ADDR		(0x01c84000)
+#endif
 
+#ifdef CFG_DM6467_EVM
+/* MDIO module input frequency */
+#define EMAC_MDIO_BUS_FREQ		76500000 
+/* MDIO clock output frequency */
+#define EMAC_MDIO_CLOCK_FREQ		2500000		/* 2.5 MHz */
+#elif defined(CFG_DM365_EVM)
+/* MDIO module input frequency */
+#define EMAC_MDIO_BUS_FREQ		121500000 
+/* MDIO clock output frequency */
+#define EMAC_MDIO_CLOCK_FREQ		2200000		/* 2.2 MHz */
+#else
 /* MDIO module input frequency */
 #define EMAC_MDIO_BUS_FREQ		99000000	/* PLL/6 - 99 MHz */
 /* MDIO clock output frequency */
 #define EMAC_MDIO_CLOCK_FREQ		2000000		/* 2.0 MHz */
+#endif
+
+/* PHY mask - set only those phy number bits where phy is/can be connected */
+#define EMAC_MDIO_PHY_NUM           1
+#define EMAC_MDIO_PHY_MASK          (1 << EMAC_MDIO_PHY_NUM)
 
 /* Ethernet Min/Max packet size */
 #define EMAC_MIN_ETHERNET_PKT_SIZE	60
@@ -78,6 +101,9 @@
 /* MII Status Register */
 #define MII_STATUS_REG			1
 
+/* Intel LXT971 Digtal Config Register */
+#define MII_DIGITAL_CONFIG_REG      26
+
 /* Number of statistics registers */
 #define EMAC_NUM_STATS			36
 
@@ -103,6 +129,8 @@ typedef volatile struct _emac_desc
 
 #define EMAC_MACCONTROL_MIIEN_ENABLE		(0x20)
 #define EMAC_MACCONTROL_FULLDUPLEX_ENABLE	(0x1)
+#define EMAC_MACCONTROL_GIGABIT_ENABLE		(1 << 7)
+#define EMAC_MACCONTROL_GIGFORCE		(1 << 17)
 
 #define EMAC_RXMBPENABLE_RXCAFEN_ENABLE	(0x200000)
 #define EMAC_RXMBPENABLE_RXBROADEN	(0x2000)
@@ -257,12 +285,19 @@ typedef struct  {
 } emac_regs;
 
 /* EMAC Wrapper Registers Structure */
+#if defined(CFG_DM6467_EVM) || defined(CFG_DM365_EVM) 
+typedef struct  {
+	dv_reg		IDVER;
+	dv_reg		SOFTRST;
+	dv_reg		EMCTRL;
+} ewrap_regs;
+#else
 typedef struct  {
 	u_int8_t	RSVD0[4100];
 	dv_reg		EWCTL;
 	dv_reg		EWINTTCNT;
 } ewrap_regs;
-
+#endif
 
 /* EMAC MDIO Registers Structure */
 typedef struct  {

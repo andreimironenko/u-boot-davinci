@@ -28,11 +28,8 @@
 
 #include <asm/arch/hardware.h>
 
-#define	MASK_CLE	0x10
-#define	MASK_ALE	0x0a
-
-#define NAND_CE0CLE	((volatile u_int8_t *)(CONFIG_SYS_NAND_BASE + 0x10))
-#define NAND_CE0ALE	((volatile u_int8_t *)(CONFIG_SYS_NAND_BASE + 0x0a))
+#define NAND_CE0CLE	((volatile u_int8_t *)(CONFIG_SYS_NAND_BASE + CONFIG_MASK_CLE))
+#define NAND_CE0ALE	((volatile u_int8_t *)(CONFIG_SYS_NAND_BASE + CONFIG_MASK_ALE))
 #define NAND_CE0DATA	((volatile u_int8_t *)CONFIG_SYS_NAND_BASE)
 
 typedef struct  {
@@ -89,7 +86,6 @@ typedef volatile nand_registers	*nandregs;
 #define NAND_READ_END		0x30
 #define NAND_STATUS		0x70
 
-#ifdef CONFIG_SYS_NAND_HW_ECC
 #define NAND_Ecc_P1e		(1 << 0)
 #define NAND_Ecc_P2e		(1 << 1)
 #define NAND_Ecc_P4e		(1 << 2)
@@ -156,6 +152,5 @@ typedef volatile nand_registers	*nandregs;
 
 #define P4e_s(a)		(TF(a & NAND_Ecc_P4e) << 0)
 #define P4o_s(a)		(TF(a & NAND_Ecc_P4o) << 1)
-#endif
 
 #endif
