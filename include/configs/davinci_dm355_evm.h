@@ -108,12 +108,12 @@
 //#define CONFIG_SYS_NAND_HW_ECC
 //#define CFG_DAVINCI_STD_NAND_LAYOUT
 //#define CONFIG_SYS_NAND_4BIT_HW_ECC
-//#define CONFIG_SYS_NAND_4BIT_HW_ECC_OOBFIRST
+#define CONFIG_SYS_NAND_4BIT_HW_ECC_OOBFIRST
 #define CONFIG_SYS_MAX_NAND_DEVICE	2	/* Max number of NAND devices */
 #define	CONFIG_MASK_CLE			0x10
 #define	CONFIG_MASK_ALE			0x08
-#define CONFIG_ENV_OFFSET		0x400000	
-//#define CONFIG_ENV_OFFSET		0x3C0000	/* environment starts here  */
+//#define CONFIG_ENV_OFFSET		0x400000	
+#define CONFIG_ENV_OFFSET		0x3C0000	/* environment starts here  */
 #define CONFIG_SYS_NAND_BASE_LIST      {CONFIG_SYS_NAND_BASE,CONFIG_SYS_NAND_BASE + 0x4000}
 #define DEF_BOOTM		""
 /*==============================*/
