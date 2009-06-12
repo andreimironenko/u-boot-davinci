@@ -38,9 +38,9 @@
  */
 #define CONFIG_ARMCORTEXA8	1	/* This is an ARM V7 CPU core */
 #define CONFIG_OMAP		1	/* in a TI OMAP core */
-#define CONFIG_OMAP34XX		1	/* which is a 34XX */
-#define CONFIG_OMAP3430		1	/* which is in a 3430 */
-#define CONFIG_OMAP3_OMAP3517EVM	1	/* working with EVM */
+#define CONFIG_OMAP35XX		1	/* which is a 34XX */
+//#define CONFIG_OMAP3_OMAP3517EVM	1	/* working with EVM */
+#define CONFIG_OMAP3_OMAP3517TEB	1	/* working with TEB */
 
 #include <asm/arch/cpu.h>	/* get chip and board defs */
 #include <asm/arch/omap3.h>
@@ -176,7 +176,7 @@
 		"bootm ${loadaddr}\0" \
 	"nandboot=echo Booting from nand ...; " \
 		"run nandargs; " \
-		"onenand read ${loadaddr} 280000 400000; " \
+		"nand read ${loadaddr} 80000 40000; " \
 		"bootm ${loadaddr}\0" \
 
 #define CONFIG_BOOTCOMMAND \
@@ -270,10 +270,8 @@
 
 /* Monitor at start of flash */
 #define CONFIG_SYS_MONITOR_BASE		CONFIG_SYS_FLASH_BASE
-#define CONFIG_SYS_ONENAND_BASE		ONENAND_MAP
 
 #define CONFIG_ENV_IS_IN_NAND		1
-#define ONENAND_ENV_OFFSET		0x260000 /* environment starts here */
 #define SMNAND_ENV_OFFSET		0x260000 /* environment starts here */
 
 #define CONFIG_SYS_ENV_SECT_SIZE	boot_flash_sec

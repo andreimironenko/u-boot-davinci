@@ -32,23 +32,23 @@
 #include <command.h>
 
 /* Definitions for EMIF4 configuration values */
-#define EMIF4_TIM1_T_RP         0x4
-#define EMIF4_TIM1_T_RCD        0x4
-#define EMIF4_TIM1_T_WR         0x2
+#define EMIF4_TIM1_T_RP         0x3
+#define EMIF4_TIM1_T_RCD        0x3
+#define EMIF4_TIM1_T_WR         0x3
 #define EMIF4_TIM1_T_RAS        0x8
-#define EMIF4_TIM1_T_RC         13
+#define EMIF4_TIM1_T_RC         0xA
 #define EMIF4_TIM1_T_RRD        0x2
 #define EMIF4_TIM1_T_WTR        0x2
 
 #define EMIF4_TIM2_T_XP         0x2
 #define EMIF4_TIM2_T_ODT        0x0
-#define EMIF4_TIM2_T_XSNR       28
-#define EMIF4_TIM2_T_XSRD       200
-#define EMIF4_TIM2_T_RTP        0x2
-#define EMIF4_TIM2_T_CKE        0x3
+#define EMIF4_TIM2_T_XSNR       0x1C
+#define EMIF4_TIM2_T_XSRD       0xC8
+#define EMIF4_TIM2_T_RTP        0x1
+#define EMIF4_TIM2_T_CKE        0x2
 
 #define EMIF4_TIM3_T_TDQSCKMAX  0x0
-#define EMIF4_TIM3_T_RFC        33
+#define EMIF4_TIM3_T_RFC        0x25
 #define EMIF4_TIM3_T_RAS_MAX    0x7
 
 #define EMIF4_PWR_IDLE          0x2
@@ -58,7 +58,7 @@
 
 #define EMIF4_INITREF_DIS       0x0
 #define EMIF4_PASR              0x0
-#define EMIF4_REFRESH_RATE      1295
+#define EMIF4_REFRESH_RATE      0x50F
 
 #define EMIF4_CFG_SDRAM_TYP     0x2
 #define EMIF4_CFG_IBANK_POS     0x0
@@ -69,14 +69,21 @@
 #define EMIF4_CFG_SDR_DRV       0x0
 #define EMIF4_CFG_CWL           0x0
 #define EMIF4_CFG_NARROW_MD     0x0
-#define EMIF4_CFG_CL            0x3
-#define EMIF4_CFG_ROWSIZE       0x3
+#define EMIF4_CFG_CL            0x5
+#define EMIF4_CFG_ROWSIZE       0x0
 #define EMIF4_CFG_IBANK         0x3
 #define EMIF4_CFG_EBANK         0x0
 #define EMIF4_CFG_PGSIZE        0x2
 
-#define EMIF4_DDR1_READ_LAT	0x3
+/*
+ * EMIF4 PHY Control 1 register configuration
+ */
+#define EMIF4_DDR1_READ_LAT	0x6
+#define EMIF4_DDR1_PWRDN_DIS    0x1
+#define EMIF4_DDR1_STRBEN_EXT   0x1
+#define EMIF4_DDR1_DLL_MODE     0x0
 #define EMIF4_DDR1_VTP_DYN	0x1
+#define EMIF4_DDR1_LB_CK_SEL    0x0
 
 /*
  * Only One NAND allowed on board at a time.
@@ -101,10 +108,14 @@ static u32 gpmc_m_nand[GPMC_MAX_REG] = {
 gpmc_csx_t *nand_cs_base;
 gpmc_t *gpmc_cfg_base;
 
+#if !defined (CONFIG_OMAP3_OMAP3517TEB)
 #if defined(CONFIG_ENV_IS_IN_NAND)
 #define GPMC_CS 0
 #else
 #define GPMC_CS 1
+#endif
+#else
+#define GPMC_CS 2
 #endif
 
 #endif
@@ -252,7 +263,9 @@ void emif4_init(void)
 {
 	unsigned int regval;
 	/* Set the DDR PHY parameters in PHY ctrl registers */
-	regval = (EMIF4_DDR1_READ_LAT | (EMIF4_DDR1_VTP_DYN << 15));
+	regval = (EMIF4_DDR1_READ_LAT | (EMIF4_DDR1_VTP_DYN << 15) |
+		(EMIF4_DDR1_STRBEN_EXT << 7) | (EMIF4_DDR1_DLL_MODE << 12) |
+		(EMIF4_DDR1_VTP_DYN << 15) | (EMIF4_DDR1_LB_CK_SEL << 23));
 	writel(regval, &emif4_base->ddr_phyctrl1);
 	writel(regval, &emif4_base->ddr_phyctrl1_shdw);
 	writel(0, &emif4_base->ddr_phyctrl2);
@@ -261,8 +274,13 @@ void emif4_init(void)
 	regval = readl(&emif4_base->sdram_iodft_tlgc);
 	regval |= (1<<10);
 	writel(regval, &emif4_base->sdram_iodft_tlgc);
-	while ((readl(&emif4_base->sdram_sts) & (1<<10)) == 0x0);
+	/*Wait till that bit clears*/
+	while ((readl(&emif4_base->sdram_iodft_tlgc) & (1<<10)) == 0x1);
+	/*Re-verify the DDR PHY status*/
+	while ((readl(&emif4_base->sdram_sts) & (1<<2)) == 0x0);
 
+	regval |= (1<<0);
+	writel(regval, &emif4_base->sdram_iodft_tlgc);
 	/* Set SDR timing registers */
 	regval = (EMIF4_TIM1_T_WTR | (EMIF4_TIM1_T_RRD << 3) |
 		(EMIF4_TIM1_T_RC << 6) | (EMIF4_TIM1_T_RAS << 12) |

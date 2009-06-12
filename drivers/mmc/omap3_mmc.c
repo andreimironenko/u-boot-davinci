@@ -57,7 +57,7 @@ block_dev_desc_t *mmc_get_dev(int dev)
 {
 	return (block_dev_desc_t *) &mmc_blk_dev;
 }
-
+#if defined (CONFIG_OMAP3_EVM)
 void twl4030_mmc_config(void)
 {
 	unsigned char data;
@@ -67,12 +67,14 @@ void twl4030_mmc_config(void)
 	data = VMMC1_VSEL_30;
 	i2c_write(PWRMGT_ADDR_ID4, VMMC1_DEDICATED, 1, &data, 1);
 }
-
+#endif
 unsigned char mmc_board_init(void)
 {
 	t2_t *t2_base = (t2_t *)T2_BASE;
 
+#if defined (CONFIG_OMAP3_EVM)
 	twl4030_mmc_config();
+#endif
 
 	writel(readl(&t2_base->pbias_lite) | PBIASLITEPWRDNZ1 |
 		PBIASSPEEDCTRL0 | PBIASLITEPWRDNZ0,

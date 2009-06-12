@@ -224,9 +224,9 @@ void s_init(void)
 	per_clocks_enable();
 
 	if (!in_sdram)
-#ifdef CONFIG_OMAP3_OMAP3517EVM
+#if defined (CONFIG_OMAP35XX)
 		emif4_init();
-#else
+#elif defined (CONFIG_OMAP34XX)
 		sdrc_init();
 #endif
 }
@@ -288,16 +288,21 @@ int dram_init(void)
 	 * memory on CS0.
 	 */
 	if ((sysinfo.mtype == DDR_COMBO) || (sysinfo.mtype == DDR_STACKED)) {
-#ifdef CONFIG_OMAP3_OMAP3517EVM
+#if defined (CONFIG_OMAP35XX)
 		emif4_init();
-#else
+		/*
+		 * TODO: Need to implement function to calculate
+		 *	DDR size depending on row and coloum size
+		 */
+		size0 = 128 * 1024 * 1024;
+#elif defined (CONFIG_OMAP34XX)
 		do_sdrc_init(CS1, NOT_EARLY);
 		make_cs1_contiguous();
+
+		size0 = get_sdr_cs_size(CS0);
+		size1 = get_sdr_cs_size(CS1);
 #endif
 	}
-
-	size0 = get_sdr_cs_size(CS0);
-	size1 = get_sdr_cs_size(CS1);
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
 	gd->bd->bi_dram[0].size = size0;

@@ -109,7 +109,8 @@ static int i2c_read_byte (u8 devaddr, u8 regoffset, u8 * value)
 
 		status = wait_for_pin ();
 		if (status & I2C_STAT_RRDY) {
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) \
+		|| defined(CONFIG_OMAP35XX)
 			*value = readb (I2C_DATA);
 #else
 			*value = readw (I2C_DATA);
@@ -154,7 +155,8 @@ static int i2c_write_byte (u8 devaddr, u8 regoffset, u8 value)
 	status = wait_for_pin ();
 
 	if (status & I2C_STAT_XRDY) {
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) \
+		|| defined(CONFIG_OMAP35XX)
 		/* send out 1 byte */
 		writeb (regoffset, I2C_DATA);
 		writew (I2C_STAT_XRDY, I2C_STAT);
@@ -207,7 +209,8 @@ static void flush_fifo(void)
 	while(1){
 		stat = readw(I2C_STAT);
 		if(stat == I2C_STAT_RRDY){
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) \
+		|| defined(CONFIG_OMAP35XX)
 			readb(I2C_DATA);
 #else
 			readw(I2C_DATA);
