@@ -352,6 +352,10 @@ void per_clocks_enable(void)
 	sr32(&prcm_base->fclken1_core, 13, 1, 0x1);
 	sr32(&prcm_base->iclken1_core, 13, 1, 0x1);
 
+	/* Enable UART2 clocks */
+	sr32(&prcm_base->fclken1_core, 14, 1, 0x1);
+	sr32(&prcm_base->iclken1_core, 14, 1, 0x1);
+
 	/* UART 3 Clocks */
 	sr32(&prcm_base->fclken_per, 11, 1, 0x1);
 	sr32(&prcm_base->iclken_per, 11, 1, 0x1);

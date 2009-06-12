@@ -31,6 +31,53 @@
 #include <asm/arch/sys_proto.h>
 #include <command.h>
 
+/* Definitions for EMIF4 configuration values */
+#define EMIF4_TIM1_T_RP         0x4
+#define EMIF4_TIM1_T_RCD        0x4
+#define EMIF4_TIM1_T_WR         0x2
+#define EMIF4_TIM1_T_RAS        0x8
+#define EMIF4_TIM1_T_RC         13
+#define EMIF4_TIM1_T_RRD        0x2
+#define EMIF4_TIM1_T_WTR        0x2
+
+#define EMIF4_TIM2_T_XP         0x2
+#define EMIF4_TIM2_T_ODT        0x0
+#define EMIF4_TIM2_T_XSNR       28
+#define EMIF4_TIM2_T_XSRD       200
+#define EMIF4_TIM2_T_RTP        0x2
+#define EMIF4_TIM2_T_CKE        0x3
+
+#define EMIF4_TIM3_T_TDQSCKMAX  0x0
+#define EMIF4_TIM3_T_RFC        33
+#define EMIF4_TIM3_T_RAS_MAX    0x7
+
+#define EMIF4_PWR_IDLE          0x2
+#define EMIF4_PWR_DPD_EN        0x0
+#define EMIF4_PWR_PM_EN         0x0
+#define EMIF4_PWR_PM_TIM        0x0
+
+#define EMIF4_INITREF_DIS       0x0
+#define EMIF4_PASR              0x0
+#define EMIF4_REFRESH_RATE      1295
+
+#define EMIF4_CFG_SDRAM_TYP     0x2
+#define EMIF4_CFG_IBANK_POS     0x0
+#define EMIF4_CFG_DDR_TERM      0x0
+#define EMIF4_CFG_DDR2_DDQS     0x1
+#define EMIF4_CFG_DYN_ODT       0x0
+#define EMIF4_CFG_DDR_DIS_DLL   0x0
+#define EMIF4_CFG_SDR_DRV       0x0
+#define EMIF4_CFG_CWL           0x0
+#define EMIF4_CFG_NARROW_MD     0x0
+#define EMIF4_CFG_CL            0x3
+#define EMIF4_CFG_ROWSIZE       0x3
+#define EMIF4_CFG_IBANK         0x3
+#define EMIF4_CFG_EBANK         0x0
+#define EMIF4_CFG_PGSIZE        0x2
+
+#define EMIF4_DDR1_READ_LAT	0x3
+#define EMIF4_DDR1_VTP_DYN	0x1
+
 /*
  * Only One NAND allowed on board at a time.
  * The GPMC CS Base for the same
@@ -83,6 +130,7 @@ gpmc_csx_t *onenand_cs_base;
 #endif
 
 static sdrc_t *sdrc_base = (sdrc_t *)OMAP34XX_SDRC_BASE;
+static emif4_t *emif4_base = (emif4_t *)OMAP34XX_SDRC_BASE;
 
 /**************************************************************************
  * make_cs1_contiguous() - for es2 and above remap cs1 behind cs0 to allow
@@ -193,6 +241,68 @@ void do_sdrc_init(u32 cs, u32 early)
 
 	if (!mem_ok(cs))
 		writel(0, &sdrc_base->cs[cs].mcfg);
+}
+
+/********************************************************
+ * emif4 _init() - init the emif4 module for DDR access
+ *  - early init routines, called from flash or
+ *  SRAM.
+ *******************************************************/
+void emif4_init(void)
+{
+	unsigned int regval;
+	/* Set the DDR PHY parameters in PHY ctrl registers */
+	regval = (EMIF4_DDR1_READ_LAT | (EMIF4_DDR1_VTP_DYN << 15));
+	writel(regval, &emif4_base->ddr_phyctrl1);
+	writel(regval, &emif4_base->ddr_phyctrl1_shdw);
+	writel(0, &emif4_base->ddr_phyctrl2);
+
+	/* Reset the DDR PHY and wait till completed */
+	regval = readl(&emif4_base->sdram_iodft_tlgc);
+	regval |= (1<<10);
+	writel(regval, &emif4_base->sdram_iodft_tlgc);
+	while ((readl(&emif4_base->sdram_sts) & (1<<10)) == 0x0);
+
+	/* Set SDR timing registers */
+	regval = (EMIF4_TIM1_T_WTR | (EMIF4_TIM1_T_RRD << 3) |
+		(EMIF4_TIM1_T_RC << 6) | (EMIF4_TIM1_T_RAS << 12) |
+		(EMIF4_TIM1_T_WR << 17) | (EMIF4_TIM1_T_RCD << 21) |
+		(EMIF4_TIM1_T_RP << 25));
+	writel(regval, &emif4_base->sdram_time1);
+	writel(regval, &emif4_base->sdram_time1_shdw);
+
+	regval = (EMIF4_TIM2_T_CKE | (EMIF4_TIM2_T_RTP << 3) |
+		(EMIF4_TIM2_T_XSRD << 6) | (EMIF4_TIM2_T_XSNR << 16) |
+		(EMIF4_TIM2_T_ODT << 25) | (EMIF4_TIM2_T_XP << 28));
+	writel(regval, &emif4_base->sdram_time2);
+	writel(regval, &emif4_base->sdram_time2_shdw);
+
+	regval = (EMIF4_TIM3_T_RAS_MAX | (EMIF4_TIM3_T_RFC << 4) |
+		(EMIF4_TIM3_T_TDQSCKMAX << 13));
+	writel(regval, &emif4_base->sdram_time3);
+	writel(regval, &emif4_base->sdram_time3_shdw);
+
+	/* Set the PWR control register */
+	regval = (EMIF4_PWR_PM_TIM | (EMIF4_PWR_PM_EN << 8) |
+		(EMIF4_PWR_DPD_EN << 10) | (EMIF4_PWR_IDLE << 30));
+	writel(regval, &emif4_base->sdram_pwr_mgmt);
+	writel(regval, &emif4_base->sdram_pwr_mgmt_shdw);
+
+	/* Set the DDR refresh rate control register */
+	regval = (EMIF4_REFRESH_RATE | (EMIF4_PASR << 24) |
+		(EMIF4_INITREF_DIS << 31));
+	writel(regval, &emif4_base->sdram_refresh_ctrl);
+	writel(regval, &emif4_base->sdram_refresh_ctrl_shdw);
+
+	/* set the SDRAM configuration register */
+	regval = (EMIF4_CFG_PGSIZE | (EMIF4_CFG_EBANK << 3) |
+		(EMIF4_CFG_IBANK << 4) | (EMIF4_CFG_ROWSIZE << 7) |
+		(EMIF4_CFG_CL << 10) | (EMIF4_CFG_NARROW_MD << 14) |
+		(EMIF4_CFG_CWL << 16) | (EMIF4_CFG_SDR_DRV << 18) |
+		(EMIF4_CFG_DDR_DIS_DLL << 20) | (EMIF4_CFG_DYN_ODT << 21) |
+		(EMIF4_CFG_DDR2_DDQS << 23) | (EMIF4_CFG_DDR_TERM << 24) |
+		(EMIF4_CFG_IBANK_POS << 27) | (EMIF4_CFG_SDRAM_TYP << 29));
+	writel(regval, &emif4_base->sdram_config);
 }
 
 void enable_gpmc_config(u32 *gpmc_config, gpmc_csx_t *gpmc_cs_base, u32 base,

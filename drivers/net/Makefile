@@ -70,6 +70,7 @@ COBJS-$(CONFIG_ULI526X) += uli526x.o
 COBJS-$(CONFIG_VSC7385_ENET) += vsc7385.o
 COBJS-$(CONFIG_XILINX_EMAC) += xilinx_emac.o
 COBJS-$(CONFIG_XILINX_EMACLITE) += xilinx_emaclite.o
+COBJS-$(CONFIG_TICPGMAC) += ticpgmac.o
 
 COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)

@@ -1990,6 +1990,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_BLAZE                2004
 #define MACH_TYPE_LINKSTATION_LS_HGL   2005
 #define MACH_TYPE_HTCVENUS             2006
+#define MACH_TYPE_OMAP3517EVM          2200
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type

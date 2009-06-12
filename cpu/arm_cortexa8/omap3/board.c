@@ -224,7 +224,11 @@ void s_init(void)
 	per_clocks_enable();
 
 	if (!in_sdram)
+#ifdef CONFIG_OMAP3_OMAP3517EVM
+		emif4_init();
+#else
 		sdrc_init();
+#endif
 }
 
 /******************************************************************************
@@ -284,8 +288,12 @@ int dram_init(void)
 	 * memory on CS0.
 	 */
 	if ((sysinfo.mtype == DDR_COMBO) || (sysinfo.mtype == DDR_STACKED)) {
+#ifdef CONFIG_OMAP3_OMAP3517EVM
+		emif4_init();
+#else
 		do_sdrc_init(CS1, NOT_EARLY);
 		make_cs1_contiguous();
+#endif
 	}
 
 	size0 = get_sdr_cs_size(CS0);

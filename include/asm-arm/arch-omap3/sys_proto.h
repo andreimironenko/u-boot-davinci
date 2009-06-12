@@ -36,6 +36,7 @@ void memif_init(void);
 void sdrc_init(void);
 void do_sdrc_init(u32, u32);
 void gpmc_init(void);
+void emif4_init(void);
 
 void watchdog_init(void);
 void set_muxconf_regs(void);

@@ -432,9 +432,9 @@ void start_armboot (void)
 
 	/* Perform network card initialisation if necessary */
 #ifdef CONFIG_DRIVER_TI_EMAC
-extern void davinci_eth_set_mac_addr (const u_int8_t *addr);
+extern void cpgmac_eth_set_mac_addr (const u_int8_t *addr);
 	if (getenv ("ethaddr")) {
-		davinci_eth_set_mac_addr(gd->bd->bi_enetaddr);
+		cpgmac_eth_set_mac_addr(gd->bd->bi_enetaddr);
 	}
 #endif
 
