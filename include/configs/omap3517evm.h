@@ -39,8 +39,8 @@
 #define CONFIG_ARMCORTEXA8	1	/* This is an ARM V7 CPU core */
 #define CONFIG_OMAP		1	/* in a TI OMAP core */
 #define CONFIG_OMAP35XX		1	/* which is a 34XX */
-//#define CONFIG_OMAP3_OMAP3517EVM	1	/* working with EVM */
-#define CONFIG_OMAP3_OMAP3517TEB	1	/* working with TEB */
+#define CONFIG_OMAP3_OMAP3517EVM	1	/* working with EVM */
+//#define CONFIG_OMAP3_OMAP3517TEB	1	/* working with TEB */
 
 #include <asm/arch/cpu.h>	/* get chip and board defs */
 #include <asm/arch/omap3.h>
@@ -83,9 +83,9 @@
 /*
  * select serial console configuration
  */
-#define CONFIG_CONS_INDEX		1
-#define CONFIG_SYS_NS16550_COM1		OMAP34XX_UART1
-#define CONFIG_SERIAL1			1	/* UART1 on OMAP3 EVM */
+#define CONFIG_CONS_INDEX		3
+#define CONFIG_SYS_NS16550_COM3		OMAP34XX_UART3
+#define CONFIG_SERIAL3			3	/* UART1 on OMAP3 EVM */
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE

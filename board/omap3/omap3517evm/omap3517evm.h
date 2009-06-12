@@ -241,7 +241,7 @@ static void setup_net_chip(void);
  MUX_VAL(CP(MCBSP1_FSX),	(IEN  | PTD | DIS | M0)) /*MCBSP1_FSX*/\
  MUX_VAL(CP(MCBSP1_CLKX),	(IEN  | PTD | DIS | M0)) /*MCBSP1_CLKX  */\
  /*Serial Interface*/\
- MUX_VAL(CP(UART3_CTS_RCTX),	(IEN  | PTD | EN  | M0)) /*UART3_CTS_*/\
+ MUX_VAL(CP(UART3_CTS_RCTX),	(IEN  | PTU | DIS  | M0)) /*UART3_CTS_*/\
 							 /* RCTX*/\
  MUX_VAL(CP(UART3_RTS_SD),	(IDIS | PTD | DIS | M0)) /*UART3_RTS_SD */\
  MUX_VAL(CP(UART3_RX_IRRX),	(IEN  | PTD | DIS | M0)) /*UART3_RX_IRRX*/\
@@ -279,8 +279,8 @@ static void setup_net_chip(void);
  MUX_VAL(CP(MCSPI2_CLK),	(IEN  | PTD | DIS | M0)) /*McSPI2_CLK*/\
  MUX_VAL(CP(MCSPI2_SIMO),	(IEN  | PTD | DIS | M0)) /*McSPI2_SIMO*/\
  MUX_VAL(CP(MCSPI2_SOMI),	(IEN  | PTD | DIS | M0)) /*McSPI2_SOMI*/\
- MUX_VAL(CP(MCSPI2_CS0),	(IEN  | PTD | EN  | M0)) /*McSPI2_CS0*/\
- MUX_VAL(CP(MCSPI2_CS1),	(IEN  | PTD | EN  | M0)) /*McSPI2_CS1*/\
+ MUX_VAL(CP(MCSPI2_CS0),	(IEN  | PTD | EN  | M4)) /*McSPI2_CS0*/\
+ MUX_VAL(CP(MCSPI2_CS1),	(IEN  | PTD | EN  | M4)) /*McSPI2_CS1*/\
  /*Control and debug */\
  MUX_VAL(CP(SYS_32K),		(IEN  | PTD | DIS | M0)) /*SYS_32K*/\
  MUX_VAL(CP(SYS_CLKREQ),	(IEN  | PTD | DIS | M0)) /*SYS_CLKREQ*/\

@@ -368,6 +368,12 @@ void per_clocks_enable(void)
 	/* Enable the ICLK for 32K Sync Timer as its used in udelay */
 	sr32(&prcm_base->iclken_wkup, 2, 1, 0x1);
 
+	sr32(&prcm_base->fclken1_core, 24, 1, 1);
+	sr32(&prcm_base->iclken_wkup, 24, 1, 1);
+
+	sr32(&prcm_base->fclken1_core, 25, 1, 1);
+	sr32(&prcm_base->iclken_wkup, 25, 1, 1);
+
 	sr32(&prcm_base->fclken_iva2, 0, 32, FCK_IVA2_ON);
 	sr32(&prcm_base->fclken1_core, 0, 32, FCK_CORE1_ON);
 	sr32(&prcm_base->iclken1_core, 0, 32, ICK_CORE1_ON);
