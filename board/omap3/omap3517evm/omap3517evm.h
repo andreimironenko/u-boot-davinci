@@ -196,8 +196,10 @@ static void setup_net_chip(void);
  MUX_VAL(CP(MMC1_DAT1),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT1*/\
  MUX_VAL(CP(MMC1_DAT2),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT2*/\
  MUX_VAL(CP(MMC1_DAT3),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT3*/\
- MUX_VAL(CP(MMC1_DAT4),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT4*/\
- MUX_VAL(CP(MMC1_DAT5),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT5*/\
+ MUX_VAL(CP(MMC1_DAT4),		(IEN  | PTU | EN  | M4)) /*MMC1_DAT4,\
+							   WriteProtect*/\
+ MUX_VAL(CP(MMC1_DAT5),		(IEN  | PTU | EN  | M4)) /*MMC1_DAT5,\
+							   CardDetect*/\
  MUX_VAL(CP(MMC1_DAT6),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT6*/\
  MUX_VAL(CP(MMC1_DAT7),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT7*/\
  /*Wireless LAN */\
