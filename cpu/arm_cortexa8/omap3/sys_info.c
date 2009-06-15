@@ -107,10 +107,15 @@ u32 get_sdr_cs_size(u32 cs)
 {
 	u32 size;
 
+#if defined (CONFIG_OMAP35XX)
+	size = calc_size_from_emif4(cs);
+#elif defined (CONFIG_OMAP34XX)
 	/* get ram size field */
 	size = readl(&sdrc_base->cs[cs].mcfg) >> 8;
 	size &= 0x3FF;		/* remove unwanted bits */
 	size *= SZ_2M;		/* find size in MB */
+#endif
+
 	return size;
 }
 

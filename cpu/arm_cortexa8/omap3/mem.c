@@ -254,6 +254,23 @@ void do_sdrc_init(u32 cs, u32 early)
 		writel(0, &sdrc_base->cs[cs].mcfg);
 }
 
+unsigned long calc_size_from_emif4(int cs)
+{
+	unsigned int size;
+#if 0
+	unsigned int reg_pagesize, reg_ebank, reg_ibank, reg_rowsize;
+
+	/*
+	 * TODO: Calculate the DDR size based on EMIF configuration
+	 *	done by x-loader.
+	 */
+	size = 
+#else
+	size = CONFIG_SYS_CS0_SIZE;
+#endif
+
+	return size;
+}
 /********************************************************
  * emif4 _init() - init the emif4 module for DDR access
  *  - early init routines, called from flash or

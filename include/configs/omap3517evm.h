@@ -67,6 +67,11 @@
 						/* initial data */
 
 /*
+ * DDR size interfaced
+ */
+#define CONFIG_SYS_CS0_SIZE		SZ_256M
+
+/*
  * Hardware drivers
  */
 

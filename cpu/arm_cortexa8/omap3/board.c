@@ -275,33 +275,24 @@ void watchdog_init(void)
 int dram_init(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
-	unsigned int size0 = 0, size1 = 0;
+	unsigned long size0 = 0, size1 = 0;
 	u32 btype;
 
 	btype = get_board_type();
 
 	display_board_info(btype);
 
+	size0 = get_sdr_cs_size(CS0);
 	/*
 	 * If a second bank of DDR is attached to CS1 this is
 	 * where it can be started.  Early init code will init
 	 * memory on CS0.
 	 */
 	if ((sysinfo.mtype == DDR_COMBO) || (sysinfo.mtype == DDR_STACKED)) {
-#if defined (CONFIG_OMAP35XX)
-		emif4_init();
-		/*
-		 * TODO: Need to implement function to calculate
-		 *	DDR size depending on row and coloum size
-		 */
-		size0 = 128 * 1024 * 1024;
-#elif defined (CONFIG_OMAP34XX)
 		do_sdrc_init(CS1, NOT_EARLY);
 		make_cs1_contiguous();
 
-		size0 = get_sdr_cs_size(CS0);
 		size1 = get_sdr_cs_size(CS1);
-#endif
 	}
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
