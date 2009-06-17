@@ -268,26 +268,44 @@ STATIC int gen_is_phy_connected(int phy_addr)
 
 STATIC int gen_get_link_status(int phy_addr)
 {
-	u_int16_t	tmp;
+	u_int16_t	tmp,lpa_val,val;
 
 	if (cpgmac_eth_phy_read(phy_addr, MII_STATUS_REG, &tmp)
 							&& (tmp & 0x04)) {
+		//printf("Phy %d MII_Status Reg=0x%x \n",phy_addr,tmp);
+		//printf("MACCTRL 0x%x\n",adap_emac->MACCONTROL);
 
+		cpgmac_eth_phy_read(phy_addr,MII_CTRL_REG,&val);
+		//printf("Phy CTRL=0x%x \n",val);
+		
+		cpgmac_eth_phy_read(phy_addr,ANEG_ADVERTISE_REG,&val);
+	//	printf("Phy ANEG ADV=0x%x \n",val);
+              
+		cpgmac_eth_phy_read(phy_addr,ANEG_LPA_REG,&lpa_val);
+		//printf("Phy ANEG LPA=0x%x \n",lpa_val);
+	      
 		/* Speed doesn't matter, there is no setting for it in EMAC. */
-		if (tmp & GEN_PHY_STATUS_FD_MASK) {
+		//if (tmp & GEN_PHY_STATUS_FD_MASK) {
+		if (lpa_val & (GEN_PHY_ANEG_100DUP | GEN_PHY_ANEG_10DUP ) ) {
 			/* set EMAC for Full Duplex  */
+		//	printf("Set MACCTRL for full duplex \n");
 			adap_emac->MACCONTROL = EMAC_MACCONTROL_MIIEN_ENABLE |
 				EMAC_MACCONTROL_FULLDUPLEX_ENABLE;
 		} else {
 			/*set EMAC for Half Duplex  */
 			adap_emac->MACCONTROL = EMAC_MACCONTROL_MIIEN_ENABLE;
+		//	printf("Set MACCTRL for HALF duplex \n");
 		}
 
 #ifdef CONFIG_DRIVER_TI_EMAC_USE_RMII
-		if(tmp & GEN_PHY_STATUS_SPEED100_MASK) {
+		//if(tmp & GEN_PHY_STATUS_SPEED100_MASK) {
+		if (lpa_val & (GEN_PHY_ANEG_100DUP | GEN_PHY_ANEG_100TX ) ) {
 			adap_emac->MACCONTROL |= EMAC_MACCONTROL_RMIISPEED_100;
+		//	printf("Set maccontrol for RMII 100 - 0x%x\n",adap_emac->MACCONTROL);
+
 		} else {
 			adap_emac->MACCONTROL &= ~EMAC_MACCONTROL_RMIISPEED_100;
+			printf("Set maccontrol for RMII 10 -  0x%x\n",adap_emac->MACCONTROL);
 		}
 #endif
 
@@ -299,20 +317,62 @@ STATIC int gen_get_link_status(int phy_addr)
 
 STATIC int gen_auto_negotiate(int phy_addr)
 {
-	u_int16_t	tmp;
+	u_int16_t	tmp,val;
+	unsigned long cntr =0;
 
 	if (!cpgmac_eth_phy_read(phy_addr, PHY_BMCR, &tmp))
 		return(0);
 
+        printf("read BMCR 0x%x\n",tmp);
+	
+	val = tmp | GEN_PHY_CTRL_DUP | GEN_PHY_CTRL_ENA_ANEG | GEN_PHY_CTRL_SPD_SEL ;
+	cpgmac_eth_phy_write(phy_addr, PHY_BMCR, val);
+	cpgmac_eth_phy_read(phy_addr, PHY_BMCR, &val);
+	printf("BMCR set to 0x%X \n",val);
+
+	cpgmac_eth_phy_read(phy_addr,ANEG_ADVERTISE_REG, &val);
+	printf("read ANEG 0x%x \n",val);
+	val |= ( GEN_PHY_ANEG_100DUP | GEN_PHY_ANEG_100TX | GEN_PHY_ANEG_10DUP | GEN_PHY_ANEG_10TX );
+	printf("writing back 0x%x \n",val);
+	cpgmac_eth_phy_write(phy_addr, ANEG_ADVERTISE_REG, val);
+	cpgmac_eth_phy_read(phy_addr,ANEG_ADVERTISE_REG, &val);
+	printf("ANEG ADVT set to 0x%x \n", val);
+
+	
+	printf("Restart Auto-negn \n");
+	cpgmac_eth_phy_read(phy_addr, PHY_BMCR, &tmp);
+	
 	/* Restart Auto_negotiation  */
-	tmp |= PHY_BMCR_AUTON;
+	tmp |= PHY_BMCR_RST_NEG;
+	printf("writing bk 0x%x to BMCR for anegn \n",tmp);
 	cpgmac_eth_phy_write(phy_addr, PHY_BMCR, tmp);
 
 	/*check AutoNegotiate complete */
-	udelay (10000);
+	//udelay (10000);
+	do{
+		udelay(40000);
+		cntr++;
+		}while(cntr < 150 );
+
 	if (!cpgmac_eth_phy_read(phy_addr, PHY_BMSR, &tmp))
 		return(0);
+	printf("BMSR after negn 0x%X\n",tmp);
 
+	cpgmac_eth_phy_read(phy_addr,MII_CTRL_REG,&val);
+	printf("Phy CTRL=0x%x \n",val);
+		
+	cpgmac_eth_phy_read(phy_addr,ANEG_ADVERTISE_REG,&val);
+	printf("Phy ANEG ADV=0x%x \n",val);
+              
+	cpgmac_eth_phy_read(phy_addr,ANEG_LPA_REG,&val);
+	printf("Phy ANEG LPA=0x%x \n",val);
+	      
+	cpgmac_eth_phy_read(phy_addr,ANEG_EXP_REG,&val);
+	printf("Phy ANEG eXP=0x%x \n",val);
+	      
+	cpgmac_eth_phy_read(phy_addr,SPL_VEND_REG,&val);
+	printf("Phy SPL VEND =0x%x \n",val);
+	
 	if (!(tmp & PHY_BMSR_AUTN_COMP))
 		return(0);
 
@@ -324,16 +384,20 @@ STATIC int gen_auto_negotiate(int phy_addr)
 #if defined(CONFIG_MII) || defined(CONFIG_CMD_MII)
 STATIC int cpgmac_mii_phy_read(char *devname, unsigned char addr, unsigned char reg, unsigned short *value)
 {
+	printf("MII Phy read \n");
 	return(cpgmac_eth_phy_read(addr, reg, value) ? 0 : 1);
 }
 
 STATIC int cpgmac_mii_phy_write(char *devname, unsigned char addr, unsigned char reg, unsigned short value)
 {
+
+	printf("MII Phy write \n");
 	return(cpgmac_eth_phy_write(addr, reg, value) ? 0 : 1);
 }
 
 int cpgmac_eth_miiphy_initialize(bd_t *bis)
 {
+	printf("MIIPHY initialize \n");
 	miiphy_register(phy.name, cpgmac_mii_phy_read, cpgmac_mii_phy_write);
 
 	return(1);
@@ -398,6 +462,28 @@ STATIC int cpgmac_eth_hw_init(void)
 	}
 
 	printf("Ethernet PHY: %s\n", phy.name);
+
+	/* Override HW configuration value that were latched */
+	cpgmac_eth_phy_read(active_phy_addr, SPL_VEND_REG, &tmp);
+	printf("read HW config for PHY 0x%x\n",tmp);
+//	tmp |= (1 << 14) | ( 7 << 5) ;
+	tmp = 0x60e0;
+	printf("Program HW config as 0x%x \n",tmp);
+	cpgmac_eth_phy_write(active_phy_addr,SPL_VEND_REG,tmp);
+
+	/* Soft reset the PHY */
+	cpgmac_eth_phy_write(active_phy_addr, PHY_BMCR, (1 << 15));
+
+	active_phy_addr = 0;
+
+	do
+	{
+	cpgmac_eth_phy_read(active_phy_addr, PHY_BMCR , &tmp);
+	
+	}while (tmp & (1 << 15));
+
+	
+	
 
 	return(1);
 }
@@ -505,7 +591,7 @@ STATIC int cpgmac_eth_open(void)
 	clkdiv = (EMAC_MDIO_BUS_FREQ / EMAC_MDIO_CLOCK_FREQ) - 1;
 	adap_mdio->CONTROL = ((clkdiv & 0xff) | MDIO_CONTROL_ENABLE | MDIO_CONTROL_FAULT);
 
-	if (!phy.get_link_status(active_phy_addr))
+	if (!phy.auto_negotiate(active_phy_addr))
 		return(0);
 
 	/* Start receive process */

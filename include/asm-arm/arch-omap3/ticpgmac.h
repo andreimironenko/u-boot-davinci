@@ -81,7 +81,12 @@
 #define EMAC_TEARDOWN_VALUE		0xfffffffc
 
 /* MII Status Register */
+#define MII_CTRL_REG			0
 #define MII_STATUS_REG			1
+#define ANEG_ADVERTISE_REG		4
+#define ANEG_LPA_REG			5
+#define ANEG_EXP_REG			6
+#define SPL_VEND_REG			18	
 
 /* Number of statistics registers */
 #define EMAC_NUM_STATS			36
@@ -338,5 +343,17 @@ typedef struct
 /* Generic phy definitions */
 #define GEN_PHY_STATUS_SPEED100_MASK	((1 << 13) | (1 << 14))
 #define GEN_PHY_STATUS_FD_MASK		((1 << 11) | (1 << 13))
+
+#define GEN_PHY_ANEG_100DUP		(1 << 8)
+#define GEN_PHY_ANEG_100TX		(1 << 7)
+#define GEN_PHY_ANEG_10DUP		(1 << 6)
+#define GEN_PHY_ANEG_10TX		(1 << 5)
+
+#define GEN_PHY_CTRL_RST_ANEG		(1 << 9)
+#define GEN_PHY_CTRL_DUP			(1 << 8)
+#define GEN_PHY_CTRL_ENA_ANEG		(1 << 12)
+#define GEN_PHY_CTRL_SPD_SEL		(1 << 13)
+
+
 
 #endif  /* _TI_CPGMAC_H_ */

@@ -65,7 +65,8 @@ int misc_init_r(void)
 #endif
 
 #if defined(CONFIG_CMD_NET)
-	//setup_net_chip();
+	/* Drive the PHY reset thru GPIO 30 */
+	setup_net_chip();
 	if (!eth_hw_init()) {
 		printf("error:Ethernet init failed\n");
 		}
@@ -95,6 +96,7 @@ void set_muxconf_regs(void)
  *****************************************************************************/
 static void setup_net_chip(void)
 {
+	#if 0
 	gpio_t *gpio3_base = (gpio_t *)OMAP34XX_GPIO3_BASE;
 	gpmc_csx_t *gpmc_cs6_base = (gpmc_csx_t *)GPMC_CONFIG_CS6_BASE;
 	ctrl_t *ctrl_base = (ctrl_t *)OMAP34XX_CTRL_BASE;
@@ -125,4 +127,33 @@ static void setup_net_chip(void)
 	writel(GPIO0, &gpio3_base->cleardataout);
 	udelay(1);
 	writel(GPIO0, &gpio3_base->setdataout);
+	#else
+	volatile unsigned int ctr;
+	
+	gpio_t *gpio1_base = (gpio_t *)OMAP34XX_GPIO1_BASE;
+	ctrl_t *ctrl_base = (ctrl_t *)OMAP34XX_CTRL_BASE;
+	
+
+	/* Make GPIO 30 as output pin */
+	writel(readl(&gpio1_base->oe) & ~(GPIO30), &gpio1_base->oe);
+
+	/* Now send a pulse on the GPIO pin */
+	printf("Driving GPIO 30 low \n");
+	writel(GPIO30, &gpio1_base->cleardataout);
+	ctr  = 0;
+	do{
+		udelay(1000);
+		ctr++;
+		}while (ctr <300);
+		
+	printf("Driving GPIO 30 high \n");
+	writel(GPIO30, &gpio1_base->setdataout);
+	ctr =0;
+	/* allow the PHY to stabilize and settle down */
+	do{
+		udelay(1000);
+		ctr++;
+		}while (ctr <300);
+	
+	#endif
 }
