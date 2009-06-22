@@ -65,7 +65,11 @@ int misc_init_r(void)
 #endif
 
 #if defined(CONFIG_CMD_NET)
-	setup_net_chip();
+	//setup_net_chip();
+	if (!eth_hw_init()) {
+		printf("error:Ethernet init failed\n");
+		}
+
 #endif
 
 	dieid_num_r();

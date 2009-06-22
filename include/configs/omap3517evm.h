@@ -332,6 +332,7 @@ extern unsigned int boot_flash_type;
 #if defined(CONFIG_CMD_NET)
 #define CONFIG_TICPGMAC
 #define	CONFIG_DRIVER_TI_EMAC
+#define CONFIG_DRIVER_TI_EMAC_USE_RMII
 #define	CONFIG_MII
 #define	CONFIG_NET_RETRY_COUNT	10
 #endif /* (CONFIG_CMD_NET) */

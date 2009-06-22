@@ -36,20 +36,22 @@
 #ifndef _TI_CPGMAC_H_
 #define _TI_CPGMAC_H_
 
-#define DAVINCI_EMAC_CNTRL_REGS_BASE		0
-#define DAVINCI_EMAC_WRAPPER_CNTRL_REGS_BASE	0
-#define DAVINCI_EMAC_WRAPPER_RAM_BASE		0
+#define DAVINCI_EMAC_CNTRL_REGS_BASE		0x5C010000
+#define DAVINCI_EMAC_WRAPPER_CNTRL_REGS_BASE	0x5C000000
+#define DAVINCI_EMAC_WRAPPER_RAM_BASE		0x5C020000
 
 #define EMAC_BASE_ADDR			DAVINCI_EMAC_CNTRL_REGS_BASE
 #define EMAC_WRAPPER_BASE_ADDR		DAVINCI_EMAC_WRAPPER_CNTRL_REGS_BASE
 #define EMAC_WRAPPER_RAM_ADDR		DAVINCI_EMAC_WRAPPER_RAM_BASE
 #define EMAC_MDIO_BASE_ADDR		0x5C030000
 
+#define EMAC_HW_RAM_ADDR		0x01E20000
+
 /* MDIO module input frequency */
-#define EMAC_MDIO_BUS_FREQ		26000000	/* 26 MHZ check */		
+#define EMAC_MDIO_BUS_FREQ		166000000	/* 166 MHZ check */		
 
 /* MDIO clock output frequency */
-#define EMAC_MDIO_CLOCK_FREQ		2000000		/* 2.0 MHz */
+#define EMAC_MDIO_CLOCK_FREQ		1000000		/* 2.0 MHz */
 
 /* Ethernet Min/Max packet size */
 #define EMAC_MIN_ETHERNET_PKT_SIZE	60
@@ -59,7 +61,7 @@
 /* Number of RX packet buffers
  * NOTE: Only 1 buffer supported as of now
  */
-#define EMAC_MAX_RX_BUFFERS		10
+#define EMAC_MAX_RX_BUFFERS		8
 
 
 /***********************************************

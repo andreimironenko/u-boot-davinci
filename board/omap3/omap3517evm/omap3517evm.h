@@ -337,15 +337,15 @@ static void setup_net_chip(void);
  MUX_VAL(CP(CCDC_DATA5),	(IEN  | PTD | EN  | M0)) /*ccdc_data5*/\
  MUX_VAL(CP(CCDC_DATA6),	(IEN  | PTD | EN  | M0)) /*ccdc_data6*/\
  MUX_VAL(CP(CCDC_DATA7),	(IEN  | PTD | EN  | M0)) /*ccdc_data7*/\
- MUX_VAL(CP(RMII_MDIO_DATA),	(IEN  | PTD | EN  | M0)) /*rmii_mdio_data*/\
- MUX_VAL(CP(RMII_MDIO_CLK),	(IEN  | PTD | EN  | M0)) /*rmii_mdio_clk*/\
- MUX_VAL(CP(RMII_RXD0)	,	(IEN  | PTD | EN  | M0)) /*rmii_rxd0*/\
- MUX_VAL(CP(RMII_RXD1),		(IEN  | PTD | EN  | M0)) /*rmii_rxd1*/\
- MUX_VAL(CP(RMII_CRS_DV),	(IEN  | PTD | EN  | M0)) /*rmii_crs_dv*/\
- MUX_VAL(CP(RMII_RXER),		(IEN  | PTD | EN  | M0)) /*rmii_rxer*/\
- MUX_VAL(CP(RMII_TXD0),		(IEN  | PTD | EN  | M0)) /*rmii_txd0*/\
- MUX_VAL(CP(RMII_TXD1),		(IEN  | PTD | EN  | M0)) /*rmii_txd1*/\
- MUX_VAL(CP(RMII_TXEN),		(IEN  | PTD | EN  | M0)) /*rmii_txen*/\
+ MUX_VAL(CP(RMII_MDIO_DATA),	(PTD |  M0)) /*rmii_mdio_data*/\
+ MUX_VAL(CP(RMII_MDIO_CLK),	(PTD |  M0)) /*rmii_mdio_clk*/\
+ MUX_VAL(CP(RMII_RXD0)	,	(IEN  | PTD | M0)) /*rmii_rxd0*/\
+ MUX_VAL(CP(RMII_RXD1),		(IEN  | PTD | M0)) /*rmii_rxd1*/\
+ MUX_VAL(CP(RMII_CRS_DV),	(IEN  | PTD | M0)) /*rmii_crs_dv*/\
+ MUX_VAL(CP(RMII_RXER),		(PTD | M0)) /*rmii_rxer*/\
+ MUX_VAL(CP(RMII_TXD0),		(PTD | M0)) /*rmii_txd0*/\
+ MUX_VAL(CP(RMII_TXD1),		(PTD | M0)) /*rmii_txd1*/\
+ MUX_VAL(CP(RMII_TXEN),		(PTD | M0)) /*rmii_txen*/\
  MUX_VAL(CP(RMII_50MHZ_CLK),	(IEN  | PTD | EN  | M0)) /*rmii_50mhz_clk*/\
  MUX_VAL(CP(USB0_DRVBUS),	(IEN  | PTD | EN  | M0)) /*usb0_drvbus*/\
  MUX_VAL(CP(HECCL_TXD),		(IEN  | PTD | EN  | M0)) /*heccl_txd*/\
