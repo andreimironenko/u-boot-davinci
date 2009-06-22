@@ -219,7 +219,7 @@ void s_init(void)
 	set_muxconf_regs();
 	delay(100);
 
-	prcm_init();
+//	prcm_init();
 
 	per_clocks_enable();
 

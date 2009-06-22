@@ -390,7 +390,7 @@ static void setup_net_chip(void);
  MUX_VAL(CP(D2D_SREAD),		(IEN  | PTD | DIS | M0)) /*d2d_sread*/\
  MUX_VAL(CP(D2D_MBUSFLAG),	(IEN  | PTD | DIS | M0)) /*d2d_mbusflag*/\
  MUX_VAL(CP(D2D_SBUSFLAG),	(IEN  | PTD | DIS | M0)) /*d2d_sbusflag*/\
- MUX_VAL(CP(SDRC_CKE0),		(IDIS | PTU | EN  | M0)) /*sdrc_cke0*/\
- MUX_VAL(CP(SDRC_CKE1),		(IDIS | PTD | DIS | M7)) /*sdrc_cke1*/\
+ MUX_VAL(CP(SDRC_CKE0),		(M0)) /*sdrc_cke0*/\
+ MUX_VAL(CP(SDRC_CKE1),		(M0)) /*sdrc_cke1*/\
 
 #endif
