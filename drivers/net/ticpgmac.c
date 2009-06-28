@@ -667,24 +667,18 @@ static int cpgmac_eth_send_packet (volatile void *packet, int length)
 					  EMAC_CPPI_OWNERSHIP_BIT |
 					  EMAC_CPPI_EOP_BIT);
 				
-	if (!phy.get_link_status (active_phy_addr)) {
-	        printf("Link down . Abort Tx - pHY %d\n",active_phy_addr);
-		cpgmac_eth_ch_teardown (EMAC_CH_TX);
-		return (ret_status);
-	}
 
 	/* Send the packet */
 	adap_emac->TX0HDP = BD_TO_HW((unsigned int) emac_tx_desc);
 
 	/* Wait for packet to complete or link down */
 	while (1) {
-		#if 0
 		if (!phy.get_link_status (active_phy_addr)) {
 		        printf("Link down . Abort Tx - pHY %d\n",active_phy_addr);
 			cpgmac_eth_ch_teardown (EMAC_CH_TX);
 			return (ret_status);
 		}
-		#endif
+
 		if (adap_emac->TXINTSTATRAW & 0x01) {
 			ret_status = length;
 			break;
