@@ -2942,7 +2942,7 @@ omap3_pandora_config :	unconfig
 omap3_zoom1_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexa8 zoom1 omap3 omap3
 
-omap3517evm_config :	unconfig
+omap3517_evm_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexa8 omap3517evm omap3 omap3
 
 #########################################################################
