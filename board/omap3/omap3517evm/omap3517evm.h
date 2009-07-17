@@ -200,19 +200,15 @@ static void setup_net_chip(void);
 							   WriteProtect*/\
  MUX_VAL(CP(MMC1_DAT5),		(IEN  | PTU | EN  | M4)) /*MMC1_DAT5,\
 							   CardDetect*/\
- MUX_VAL(CP(MMC1_DAT6),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT6*/\
- MUX_VAL(CP(MMC1_DAT7),		(IEN  | PTU | DIS | M0)) /*MMC1_DAT7*/\
+ MUX_VAL(CP(MMC1_DAT6),		(IEN  | PTU | EN | M4)) /*MMC1_DAT6*/\
+ MUX_VAL(CP(MMC1_DAT7),		(IEN  | PTU | EN | M4)) /*MMC1_DAT7*/\
  /*Wireless LAN */\
- MUX_VAL(CP(MMC2_CLK),		(IEN  | PTD | DIS | M0)) /*MMC2_CLK*/\
- MUX_VAL(CP(MMC2_CMD),		(IEN  | PTU | EN  | M0)) /*MMC2_CMD*/\
- MUX_VAL(CP(MMC2_DAT0),		(IEN  | PTU | EN  | M0)) /*MMC2_DAT0*/\
- MUX_VAL(CP(MMC2_DAT1),		(IEN  | PTU | EN  | M0)) /*MMC2_DAT1*/\
- MUX_VAL(CP(MMC2_DAT2),		(IEN  | PTU | EN  | M0)) /*MMC2_DAT2*/\
- MUX_VAL(CP(MMC2_DAT3),		(IEN  | PTU | EN  | M0)) /*MMC2_DAT3*/\
- MUX_VAL(CP(MMC2_DAT4),		(IDIS | PTD | DIS | M0)) /*MMC2_DAT4*/\
- MUX_VAL(CP(MMC2_DAT5),		(IDIS | PTD | DIS | M0)) /*MMC2_DAT5*/\
- MUX_VAL(CP(MMC2_DAT6),		(IDIS | PTD | DIS | M0)) /*MMC2_DAT6 */\
- MUX_VAL(CP(MMC2_DAT7),		(IEN  | PTU | EN  | M0)) /*MMC2_DAT7*/\
+ MUX_VAL(CP(MMC2_CLK),		(IEN  | PTD | EN | M0)) /*MMC2_CLK*/\
+ MUX_VAL(CP(MMC2_CMD),		(IEN  | PTD | DIS | M0)) /*MMC2_CMD*/\
+ MUX_VAL(CP(MMC2_DAT0),		(IEN  | PTD | DIS | M0)) /*MMC2_DAT0*/\
+ MUX_VAL(CP(MMC2_DAT1),		(IEN  | PTD | DIS | M0)) /*MMC2_DAT1*/\
+ MUX_VAL(CP(MMC2_DAT2),		(IEN  | PTD | DIS | M0)) /*MMC2_DAT2*/\
+ MUX_VAL(CP(MMC2_DAT3),		(IEN  | PTD | DIS | M0)) /*MMC2_DAT3*/\
  /*Bluetooth*/\
  MUX_VAL(CP(MCBSP3_DX),		(IDIS | PTD | DIS | M0)) /*McBSP3_DX*/\
  MUX_VAL(CP(MCBSP3_DR),		(IEN  | PTD | DIS | M0)) /*McBSP3_DR*/\

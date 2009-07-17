@@ -75,13 +75,19 @@ unsigned char mmc_board_init(void)
 #if defined (CONFIG_OMAP3_EVM)
 	twl4030_mmc_config();
 #endif
-
-	writel(readl(&t2_base->pbias_lite) | PBIASLITEPWRDNZ1 |
-		PBIASSPEEDCTRL0 | PBIASLITEPWRDNZ0,
-		&t2_base->pbias_lite);
+	/*MMC1*/
+	writel(readl(&t2_base->pbias_lite) | PBIASSPEEDCTRL0
+			| PBIASLITEPWRDNZ0, &t2_base->pbias_lite);
 
 	writel(readl(&t2_base->devconf0) | MMCSDIO1ADPCLKISEL,
 		&t2_base->devconf0);
+	/*MMC2*/
+	writel(readl(&t2_base->pbias_lite) | PBIASSPEEDCTRL1
+			| PBIASLITEPWRDNZ1, &t2_base->pbias_lite);
+
+	writel(readl(&t2_base->devconf1) | MMCSDIO2ADPCLKISEL,
+		&t2_base->devconf1);
+
 
 	return 1;
 }

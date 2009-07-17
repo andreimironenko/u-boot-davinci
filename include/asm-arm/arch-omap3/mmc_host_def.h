@@ -31,15 +31,19 @@
 typedef struct t2 {
 	unsigned char res1[0x274];
 	unsigned int devconf0;		/* 0x274 */
-	unsigned char res2[0x2A8];
+	unsigned char res2[0x60];
+	unsigned int devconf1;		/* 0x2D8 */
+	unsigned char res3[0x244];
 	unsigned int pbias_lite;	/* 0x520 */
 } t2_t;
 
 #define MMCSDIO1ADPCLKISEL		(1 << 24)
+#define MMCSDIO2ADPCLKISEL		(1 << 6)
 
 #define PBIASLITEPWRDNZ0		(1 << 1)
 #define PBIASSPEEDCTRL0			(1 << 2)
 #define PBIASLITEPWRDNZ1		(1 << 9)
+#define PBIASSPEEDCTRL1			(1 << 10)
 
 /*
  * OMAP HSMMC register definitions
