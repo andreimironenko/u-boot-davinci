@@ -105,6 +105,9 @@ typedef volatile unsigned int *	dv_reg_p;
 #define DAVINCI_ASYNC_EMIF_CNTRL_BASE		0x01d10000
 #define DAVINCI_MMC_SD0_BASE			0x01d11000
 
+#elif defined(CONFIG_SOC_DM646X)
+#define DAVINCI_ASYNC_EMIF_CNTRL_BASE		0x20008000
+
 #endif
 
 /* Power and Sleep Controller (PSC) Domains */

@@ -28,41 +28,21 @@
 extern int timer_init(void);
 extern int eth_hw_init(void);
 
-/*******************************************
- Routine: board_init
- Description:  Board Initialization routine
-*******************************************/
-int board_init (void)
-{
-	DECLARE_GLOBAL_DATA_PTR;
-
-	/* arch number of DaVinci DM6467 */
-	gd->bd->bi_arch_number = 1380;
-
-	/* adress of boot parameters */
-	gd->bd->bi_boot_params = LINUX_BOOT_PARAM_ADDR;
-
-	/* Power on required peripherals */
-	davinci_hd_psc_enable();
-
-	/* Set the Bus Priority Register to appropriate value */
-	REG(VBPR) = 0x20;
-
-	timer_init();
-	return 0;
-}
+/* PSC Registers */
+#define PSC_ADDR            	0x01C41000
+#define PLL1_PLLM   		0x01C40910
+#define PLL2_PLLM   		0x01C40D10
+#define PLL2_DIV1   		0x01C40D18
 
 /*
  * Routine: davinci_hd_psc_enable
  * Description:  Enable PSC domains
  */
-void davinci_hd_psc_enable ( void )
+static void davinci_hd_psc_enable ( void )
 {
 	unsigned int alwaysonpdnum = 0;
 
-	/* Note this function assumes that the Power Domains are
-	 * alread on
-	 */
+	/* Note this function assumes that the Power Domains are alread on */
 	REG(PSC_ADDR+0xA00+4*14) |= 0x03; /* EMAC */
 	REG(PSC_ADDR+0xA00+4*15) |= 0x03; /* VDCE */
 	REG(PSC_ADDR+0xA00+4*16) |= 0x03; /* Video Port */
@@ -91,7 +71,8 @@ void davinci_hd_psc_enable ( void )
 	REG(PINMUX0) &= ~(0x0000003f << 18);
 	REG(PINMUX1) &= ~(0x00000003);
 
-#ifndef CFG_PCI_BOOT
+#if 0
+	ndef CFG_PCI_BOOT
 	/* Enable AEMIF pins */
 	REG(PINMUX0) &= ~(0x00000007);
 #endif	/* CFG_PCI_BOOT */
@@ -103,7 +84,7 @@ void davinci_hd_psc_enable ( void )
 	REG(VBPR) = 0x20;
 }
 
-void enable_tcm_cp15(void)
+static void enable_tcm_cp15(void)
 {
 	/* Set to SUPERVISOR  MODE */
 	asm (" mrs R0, cpsr\n"
@@ -151,6 +132,30 @@ void enable_tcm_cp15(void)
 
 }
 
+/*******************************************
+ Routine: board_init
+ Description:  Board Initialization routine
+*******************************************/
+int board_init (void)
+{
+	DECLARE_GLOBAL_DATA_PTR;
+
+	/* arch number of DaVinci DM6467 */
+	gd->bd->bi_arch_number = 1380;
+
+	/* adress of boot parameters */
+	gd->bd->bi_boot_params = LINUX_BOOT_PARAM_ADDR;
+
+	/* Power on required peripherals */
+	davinci_hd_psc_enable();
+
+	/* Set the Bus Priority Register to appropriate value */
+	REG(VBPR) = 0x20;
+
+	timer_init();
+	return 0;
+}
+
 /*
  *Routine: misc_init_r
  *Description:  Misc. init
@@ -161,7 +166,7 @@ int misc_init_r (void)
 	int i = 0;
 	u_int8_t tmp[20], buf[10];
 
-	clk = ((REG(PLL2_PLLM) + 1) * 27) / (REG_CHAR(PLL2_DIV1) + 1);
+	clk = ((REG(PLL2_PLLM) + 1) * 27) / ((REG(PLL2_DIV1) & 0xf) + 1);
 	printf ("ARM Clock :- %dMHz\n", ((((REG(PLL1_PLLM) + 1) * 27 ) / 2)) );
 	printf ("DDR Clock :- %dMHz\n", (clk/2));
 
@@ -179,7 +184,7 @@ int misc_init_r (void)
 		}
 	}
 
-	if (!eth_hw_init())
+//	if (!eth_hw_init())
 		printf("ethernet init failed!\n");
 
 	/* enable the ITCM and DTCM */
