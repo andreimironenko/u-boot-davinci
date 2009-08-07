@@ -37,3 +37,9 @@
 
 #Provide at least 16MB spacing between us and the Linux Kernel image
 TEXT_BASE = 0x81080000
+
+# Set libgcc patch to U-Boot implemenattion present in ./lib_arm directory. This
+# is required to ensure that U-Boot implementation of libgcc functions is used,
+# so that linking against toolchain provided library is avoided to prevent
+# EABI mismatch errors (especially in NAND code).
+USE_PRIVATE_LIBGCC = lib_arm
