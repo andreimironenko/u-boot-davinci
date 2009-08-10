@@ -32,6 +32,7 @@
 #define CFG_DM365_EVM
 #define CONFIG_SYS_USE_NAND
 #define CFG_DAVINCI_STD_NAND_LAYOUT
+#define CONFIG_SYS_NAND_PAGE_2K
 #define CONFIG_SOC_DM365
 /*===================*/
 /* SoC Configuration */
