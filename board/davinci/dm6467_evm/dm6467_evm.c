@@ -52,7 +52,7 @@ static void davinci_hd_psc_enable ( void )
 	REG(PSC_ADDR+0xA00+4*26) |= 0x03; /* UART0 */
 	REG(PSC_ADDR+0xA00+4*27) |= 0x03; /* UART1 */
 	REG(PSC_ADDR+0xA00+4*28) |= 0x03; /* UART2 */
-	REG(PSC_ADDR+0xA00+4*31) |= 0x03; /* UART3 */
+	REG(PSC_ADDR+0xA00+4*31) |= 0x03; /* I2C */
 	REG(PSC_ADDR+0xA00+4*34) |= 0x03; /* TIMER0 */
 	REG(PSC_ADDR+0xA00+4*35) |= 0x03; /* TIMER1 */
 
@@ -71,8 +71,7 @@ static void davinci_hd_psc_enable ( void )
 	REG(PINMUX0) &= ~(0x0000003f << 18);
 	REG(PINMUX1) &= ~(0x00000003);
 
-#if 0
-	ndef CFG_PCI_BOOT
+#ifndef CFG_PCI_BOOT
 	/* Enable AEMIF pins */
 	REG(PINMUX0) &= ~(0x00000007);
 #endif	/* CFG_PCI_BOOT */
