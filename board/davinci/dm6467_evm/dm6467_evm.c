@@ -71,11 +71,6 @@ static void davinci_hd_psc_enable ( void )
 	REG(PINMUX0) &= ~(0x0000003f << 18);
 	REG(PINMUX1) &= ~(0x00000003);
 
-#ifndef CFG_PCI_BOOT
-	/* Enable AEMIF pins */
-	REG(PINMUX0) &= ~(0x00000007);
-#endif	/* CFG_PCI_BOOT */
-
 	/* Enable USB */
 	REG(PINMUX0) &= ~(0x80000000);
 
@@ -182,9 +177,6 @@ int misc_init_r (void)
 			setenv("ethaddr", (char *)&tmp[0]);
 		}
 	}
-
-//	if (!eth_hw_init())
-		printf("ethernet init failed!\n");
 
 	/* enable the ITCM and DTCM */
 	enable_tcm_cp15();
