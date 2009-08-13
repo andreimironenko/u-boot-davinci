@@ -49,7 +49,7 @@
 
 /* Definitions for 4-bit hardware ECC */
 #define NAND_STATUS_RETRY		5
-#define NAND_TIMEOUT			100
+#define NAND_TIMEOUT			10240
 #define NAND_ECC_BUSY			0xC
 #define NAND_4BITECC_MASK		0x03FF03FF
 #define EMIF_NANDFSR_ECC_STATE_MASK  	0x00000F00
@@ -649,15 +649,16 @@ static int nand_davinci_4bit_compare_ecc(struct mtd_info *mtd,
 	 * Wait for the corr_state field (bits 8 to 11)in the
 	 * NAND Flash Status register to be equal to 0x0, 0x1, 0x2, or 0x3.
 	 */
-
+	i = NAND_TIMEOUT;
 	do {
-		iserror = emif_addr->NANDFSR;
-		iserror &= EMIF_NANDFSR_ECC_STATE_MASK;
-		iserror = iserror >> 8;
-	} while ((ECC_STATE_NO_ERR != iserror) &&
-		 (ECC_STATE_TOO_MANY_ERRS != iserror) &&
-		 (ECC_STATE_ERR_CORR_COMP_P != iserror) &&
-		 (ECC_STATE_ERR_CORR_COMP_N != iserror));
+        	val = emif_addr->NANDFSR;
+		val &= 0xc00;
+		i--;
+    	} while ((i > 0) && val);
+
+	iserror = emif_addr->NANDFSR;
+	iserror &= EMIF_NANDFSR_ECC_STATE_MASK;
+	iserror = iserror >> 8;
 
 
 	/*
@@ -669,13 +670,16 @@ static int nand_davinci_4bit_compare_ecc(struct mtd_info *mtd,
 	 * ECC_STATE_ERR_CORR_COMP_N (0x3) means error correction
 	 * complete (error exists).
 	 */
-	for(i = 0; i < 100; i++)
+	for (i = 0; i < 100; i++)
 		udelay (this->chip_delay);
 
-	if (iserror == ECC_STATE_NO_ERR || iserror == 5)
+	if (iserror == ECC_STATE_NO_ERR) {
+		val = emif_addr->NANDERRVAL1;
 		return 0;
-	else if (iserror == ECC_STATE_TOO_MANY_ERRS)
+	} else if (iserror == ECC_STATE_TOO_MANY_ERRS) {
+		val = emif_addr->NANDERRVAL1;
 		return -1;
+	}
 
 	numErrors = ((emif_addr->NANDFSR >> 16) & 0x3) + 1;
 
