@@ -393,7 +393,7 @@ static struct nand_ecclayout nand_davinci_4bit_layout_oobfirst = {
 		59, 60, 61, 62, 63, 
 		},
 	.oobfree = {
-		{.offset = 1, .length = 23, },
+		{.offset = 2, .length = 22, },
 	},
 #elif defined(CONFIG_SYS_NAND_PAGE_4K)
 	.eccbytes = 80,
