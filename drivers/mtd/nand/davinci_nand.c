@@ -408,7 +408,7 @@ static struct nand_ecclayout nand_davinci_4bit_layout_oobfirst = {
 		118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
 		},
 	.oobfree = {
-		{.offset = 1, .length = 47, },
+		{.offset = 2, .length = 46, },
 	},
 #endif
 };
