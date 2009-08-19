@@ -35,6 +35,11 @@ const omap3_sysinfo sysinfo = {
 #endif
 };
 
+enum {
+       OMAP3EVM_BOARD_GEN_1 = 0, /* EVM Rev between  A - D*/
+       OMAP3EVM_BOARD_GEN_2,   /* EVM Rev >= Rev E*/
+};
+
 static void setup_net_chip(void);
 
 /*
@@ -295,7 +300,7 @@ static void setup_net_chip(void);
  MUX_VAL(CP(SYS_BOOT2),		(IEN  | PTD | DIS | M4)) /*GPIO_4*/\
  MUX_VAL(CP(SYS_BOOT3),		(IEN  | PTD | DIS | M4)) /*GPIO_5*/\
  MUX_VAL(CP(SYS_BOOT4),		(IEN  | PTD | DIS | M4)) /*GPIO_6*/\
- MUX_VAL(CP(SYS_BOOT5),		(IEN  | PTD | DIS | M4)) /*GPIO_7*/\
+ MUX_VAL(CP(SYS_BOOT5),		(IEN  | PTD | EN  | M4)) /*GPIO_7*/\
  MUX_VAL(CP(SYS_BOOT6),		(IDIS | PTD | DIS | M4)) /*GPIO_8*/\
 							 /* - VIO_1V8*/\
  MUX_VAL(CP(SYS_OFF_MODE),	(IEN  | PTD | DIS | M0)) /*SYS_OFF_MODE*/\

@@ -53,6 +53,30 @@ int board_init(void)
 	return 0;
 }
 
+
+static int omap3evm_board_rev(void)
+{
+       unsigned int smsc_id;
+       /*
+        * The run time detection of EVM revision is done by reading Ethernet
+        * PHY ID -
+        *      GEN_1   = 0x01150000
+        *      GEN_2   = 0x92200000
+        */
+       smsc_id = readl(CONFIG_DRIVER_SMC911X_BASE + 0x50) & 0xFFFF0000;
+
+       switch (smsc_id) {
+       /*SMSC9115 chipset*/
+       case 0x01150000:
+               return OMAP3EVM_BOARD_GEN_1;
+       /*SMSC 9220 chipset*/
+       case 0x92200000:
+               return OMAP3EVM_BOARD_GEN_2;
+       default:
+               return OMAP3EVM_BOARD_GEN_1;
+       }
+}
+
 /******************************************************************************
  * Routine: misc_init_r
  * Description: Init ethernet (done here so udelay works)
@@ -91,7 +115,6 @@ void set_muxconf_regs(void)
  *****************************************************************************/
 static void setup_net_chip(void)
 {
-	gpio_t *gpio3_base = (gpio_t *)OMAP34XX_GPIO3_BASE;
 	gpmc_csx_t *gpmc_cs6_base = (gpmc_csx_t *)GPMC_CONFIG_CS6_BASE;
 	ctrl_t *ctrl_base = (ctrl_t *)OMAP34XX_CTRL_BASE;
 
@@ -112,13 +135,30 @@ static void setup_net_chip(void)
 	writew(readw(&ctrl_base->gpmc_nadv_ale) | 0x0E00,
 		&ctrl_base->gpmc_nadv_ale);
 
-	/* Make GPIO 64 as output pin */
-	writel(readl(&gpio3_base->oe) & ~(GPIO0), &gpio3_base->oe);
+       if (omap3evm_board_rev() >= OMAP3EVM_BOARD_GEN_2) {
+               unsigned int *gpio1_base = (unsigned int *)OMAP34XX_GPIO1_BASE;
+               /* Make GPIO8/SYS_BOOT5 as output pin */
+               writel(readl(gpio1_base + OFFS(GPIO_OE)) & ~(GPIO7),
+                               gpio1_base + OFFS(GPIO_OE));
 
-	/* Now send a pulse on the GPIO pin */
-	writel(GPIO0, &gpio3_base->setdataout);
-	udelay(1);
-	writel(GPIO0, &gpio3_base->cleardataout);
-	udelay(1);
-	writel(GPIO0, &gpio3_base->setdataout);
+               /* Now send a pulse on the GPIO pin */
+               writel(GPIO7, gpio1_base + OFFS(GPIO_SETDATAOUT));
+               udelay(1);
+               writel(GPIO7, gpio1_base + OFFS(GPIO_CLEARDATAOUT));
+               udelay(1);
+               writel(GPIO7, gpio1_base + OFFS(GPIO_SETDATAOUT));
+       } else {
+               unsigned int *gpio3_base = (unsigned int *)OMAP34XX_GPIO3_BASE;
+               /* Make GPIO 64 as output pin */
+               writel(readl(gpio3_base + OFFS(GPIO_OE)) & ~(GPIO0),
+                               gpio3_base + OFFS(GPIO_OE));
+
+               /* Now send a pulse on the GPIO pin */
+               writel(GPIO0, gpio3_base + OFFS(GPIO_SETDATAOUT));
+               udelay(1);
+               writel(GPIO0, gpio3_base + OFFS(GPIO_CLEARDATAOUT));
+               udelay(1);
+               writel(GPIO0, gpio3_base + OFFS(GPIO_SETDATAOUT));
+       }
 }
+
