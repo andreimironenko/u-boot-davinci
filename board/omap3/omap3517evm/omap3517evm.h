@@ -346,8 +346,8 @@ static void setup_net_chip(void);
  MUX_VAL(CP(RMII_TXEN),		(PTD | M0)) /*rmii_txen*/\
  MUX_VAL(CP(RMII_50MHZ_CLK),	(IEN  | PTD | EN  | M0)) /*rmii_50mhz_clk*/\
  MUX_VAL(CP(USB0_DRVBUS),	(IEN  | PTD | EN  | M0)) /*usb0_drvbus*/\
- MUX_VAL(CP(HECCL_TXD),		(IEN  | PTD | EN  | M0)) /*heccl_txd*/\
- MUX_VAL(CP(HECCL_RXD),		(IEN  | PTD | EN  | M0)) /*heccl_rxd*/\
+ MUX_VAL(CP(HECC1_TXD),		(IEN  | PTU | EN  | M0)) /*hecc1_txd*/\
+ MUX_VAL(CP(HECC1_RXD),		(IEN  | PTU | EN  | M0)) /*hecc1_rxd*/\
  MUX_VAL(CP(SYS_BOOT7),		(IEN  | PTD | EN  | M0)) /*sys_boot7*/\
  MUX_VAL(CP(SDRC_DQS0N),	(IEN  | PTD | EN  | M0)) /*sdrc_dqs0n*/\
  MUX_VAL(CP(SDRC_DQS1N),	(IEN  | PTD | EN  | M0)) /*sdrc_dqs1n*/\

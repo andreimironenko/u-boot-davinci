@@ -23,7 +23,7 @@
 #ifndef _I2C_H_
 #define _I2C_H_
 
-#define I2C_DEFAULT_BASE	I2C_BASE1
+#define I2C_DEFAULT_BASE	I2C_BASE3
 
 #define I2C_REV		(I2C_DEFAULT_BASE + 0x00)
 #define I2C_IE 		(I2C_DEFAULT_BASE + 0x04)

@@ -73,6 +73,20 @@ int misc_init_r(void)
 
 #endif
 
+	/* Set i2C exapander u20 for HECC signal CAN_STB to low */
+	unsigned char byte;
+	byte = 0xFF;
+	i2c_read(0x21, 0, 0, &byte, 1);
+	printf("HECC U20: port before = %08X\n", byte);
+	byte = 0xBF;
+	i2c_write(0x21, 6, 0, &byte, 1);
+	byte = 0x0;
+	i2c_write(0x21, 2, 0, &byte, 1);
+	printf("HECC U20: programmed CAN_STB low\n");
+	byte = 0xFF;
+	i2c_read(0x21, 0, 0, &byte, 1);
+	printf("HECC U20: port after = %08X\n", byte);
+
 	dieid_num_r();
 
 	return 0;
