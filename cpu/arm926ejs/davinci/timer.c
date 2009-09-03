@@ -80,6 +80,7 @@ void reset_timer(void)
 {
 	timer->tcr = 0x0;
 	timer->tim34 = 0;
+	timer->prd34 = TIMER_LOAD_VAL;
 	lastinc = 0;
 	timestamp = 0;
 	timer->tcr = 2 << 22;
