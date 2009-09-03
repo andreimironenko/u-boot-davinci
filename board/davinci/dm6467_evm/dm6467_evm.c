@@ -21,10 +21,20 @@
 extern int timer_init(void);
 extern int eth_hw_init(void);
 
-/* PSC Registers */
+/* Set default clock ref value so that it can be used during timer init. Will
+ * get overridden by environment variable value (if set) in misc_init_r().
+ */
+static int clkref = CFG_REFCLK_FREQ;
+
+/* Register addresses
+ * TODO: Move these to hardware.h?
+ */
 #define PSC_ADDR            	0x01C41000
 #define PLL1_PLLM   		0x01C40910
+#define PLL1_PREDIV   		0x01C40914
+#define PLL1_DIV2   		0x01C4091c
 #define PLL2_PLLM   		0x01C40D10
+#define PLL2_PREDIV   		0x01C40D14
 #define PLL2_DIV1   		0x01C40D18
 
 /*
@@ -144,18 +154,68 @@ int board_init (void)
 }
 
 /*
+ * Note: These functions should really be in dm6467 Soc/ or davinci family
+ * specific file (inside cpu/arm926ejs/davinci). Kept here for now to avoid
+ * modifying common file(s).
+ */
+
+/* davinci_arm_clk_get -
+ * 	Calculate and return the clock rate input to ARM by reading PLL
+ * 	configuration.
+ */
+int davinci_arm_clk_get()
+{
+	int pre_div, pllm, clk = clkref;
+
+	pre_div	= (REG(PLL1_PREDIV) & 0xff) + 1;
+	pllm	= REG(PLL1_PLLM)  + 1;
+
+	clk /= pre_div;
+	clk *= pllm;
+
+	clk /= ((REG(PLL1_DIV2)) & 0xff) + 1;
+	return clk;
+}
+
+/* davinci_ddr_clk_get -
+ * 	Calculate and return the DDR PHY clock rate by reading PLL
+ * 	configuration.
+ */
+int davinci_ddr_clk_get(void)
+{
+	int pre_div, pllm, clk = clkref;
+
+	pre_div	= (REG(PLL2_PREDIV) & 0xff) + 1;
+	pllm	= REG(PLL2_PLLM)  + 1;
+
+	clk /= pre_div;
+	clk *= pllm;
+
+	clk /= ((REG(PLL2_DIV1)) & 0xff) + 1;
+	return clk;
+}
+
+/*
  *Routine: misc_init_r
  *Description:  Misc. init
  */
 int misc_init_r (void)
 {
-	int clk = 0;
 	int i = 0;
 	u_int8_t tmp[20], buf[10];
+	char *s;
 
-	clk = ((REG(PLL2_PLLM) + 1) * 27) / ((REG(PLL2_DIV1) & 0xf) + 1);
-	printf ("ARM Clock :- %dMHz\n", ((((REG(PLL1_PLLM) + 1) * 27 ) / 2)) );
-	printf ("DDR Clock :- %dMHz\n", (clk/2));
+	/*
+	 * Update clkref value if 'clkref' environment variable is set.
+	 */
+	s = getenv("clkref");
+	if (s != NULL) {
+		clkref = simple_strtoul (s, NULL, 10);
+		reset_timer();	/* Update timer load value. */
+	}
+
+	printf ("ARM Clock :- %dMHz\n", davinci_arm_clk_get() / 1000000);
+	printf ("DDR Clock :- %dMHz\n",	(davinci_ddr_clk_get() / 2) / 1000000);
 
 	if (i2c_read(CONFIG_SYS_I2C_EEPROM_ADDR, 0x7f00, CONFIG_SYS_I2C_EEPROM_ADDR_LEN, buf, 6)) {
 		printf("\nEEPROM @ 0x%02x read FAILED!!!\n", CONFIG_SYS_I2C_EEPROM_ADDR);

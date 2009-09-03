@@ -27,9 +27,31 @@
 /* SoC Configuration */
 /*===================*/
 #define CONFIG_ARM926EJS			/* arm926ejs CPU core */
-#define CONFIG_SYS_CLK_FREQ	297000000	/* Arm Clock frequency */
+
+/* Clock rates detection */
+#ifndef __ASSEMBLY__
+extern int davinci_arm_clk_get(void);
+#endif
+
+/* Default CLKREF value. Needs to be hardcoded here since the actual reference
+ * clock frequency may not be available till  environment variable is set or the
+ * value is set compile time. This value gets overridden by env variable clkref
+ * (if it is set form U-Boot prompt.
+ *
+ * Note: Since environment is accessed only after timer is initialized, the
+ * first setting of timer load value uses CFG_REFCLK_FREQ as reference, which
+ * can then be reloaded. Also, a reboot is required after setting 'clkref' for
+ * new value to take effect.
+ *
+ * The environment variable value  will generally change depending on the part
+ * used and/or board.  e..g, For DM6467 594/729MHz variants -> 27000000
+ * For 1GHz (DM6467T) part EVM -> 33000000
+ */
+#define CFG_REFCLK_FREQ		27000000
+#define CONFIG_SYS_CLK_FREQ	davinci_arm_clk_get() /* Arm Clock frequency    */
+
 #define CONFIG_SYS_TIMERBASE		0x01c21400	/* use timer 0 */
-#define CONFIG_SYS_HZ_CLOCK		148500000	/* Timer Input clock freq */
+#define CONFIG_SYS_HZ_CLOCK		CONFIG_SYS_CLK_FREQ/2	/* Timer Input clock freq */
 #define CONFIG_SYS_HZ			1000
 #define CONFIG_SOC_DM646X
 /*====================================================*/
@@ -102,9 +124,18 @@
 #define CONFIG_SYS_MAX_NAND_DEVICE	1	/* Max number of NAND devices */
 #define	CONFIG_MASK_CLE			0x80000
 #define	CONFIG_MASK_ALE			0x40000
-#define CONFIG_ENV_OFFSET		0x80000	/* Block 0--not used by bootcode */
+#define CONFIG_ENV_OFFSET		0	/* Block 0--not used by bootcode */
 #define DEF_BOOTM		""
 #endif
+
+/*
+ * Additional environment variables:
+ * 	addclk: Appends value of clkref variable to kernel command line
+ */
+#define	CONFIG_EXTRA_ENV_SETTINGS					\
+	"addclk=setenv bootargs ${bootargs} clkref=${clkref}\0"		\
+	""
+
 /*==============================*/
 /* U-Boot general configuration */
 /*==============================*/
@@ -133,7 +164,7 @@
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_BOOTARGS		"mem=120M console=ttyS0,115200n8 root=/dev/hda1 rw noinitrd ip=dhcp"
-#define CONFIG_BOOTCOMMAND	"setenv setboot setenv bootargs \\$(bootargs);run setboot; bootm 0x2050000"
+#define CONFIG_BOOTCOMMAND	"dhcp; bootm"
 /*=================*/
 /* U-Boot commands */
 /*=================*/
