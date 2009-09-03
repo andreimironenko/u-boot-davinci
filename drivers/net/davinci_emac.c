@@ -201,12 +201,42 @@ static int gen_is_phy_connected(int phy_addr)
 	return(davinci_eth_phy_read(phy_addr, PHY_PHYIDR1, &dummy));
 }
 
+/*
+ * Enable gigabit mode for MAC and PHY if link is set to 1Gbps. This function
+ * should be called *only* after link is established.
+ *
+ * Note: This function accesses registers specific to ET1011C (LSI) PHY present
+ * on DM6467 EVM and thus require porting of PHY related handling part for other
+ * PHYs.
+ */
+static void enable_gig_mode(int phy_addr)
+{
+#if defined(CONFIG_SOC_DM646X)
+	u_int16_t reg_val;
+
+	/* Update MAC and PHY configuration only when speed is 1 Gbps */
+	davinci_eth_phy_read(phy_addr, MII_PHY_STATUS_REG, &reg_val);
+
+	if ((reg_val & PHY_SPEED_MASK) == PHY_SPEED_1000) {
+		davinci_eth_phy_read(phy_addr, MII_PHY_CONFIG_REG, &reg_val);
+
+		/* Enable 125MHz clock sourced from PHY */
+		davinci_eth_phy_write(phy_addr, MII_PHY_CONFIG_REG, reg_val | PHY_SYS_CLK_EN);
+
+		/* Enable gigabit mode */
+		adap_emac->MACCONTROL |= (EMAC_MACCONTROL_GIGABIT_ENABLE | EMAC_MACCONTROL_GIGFORCE);
+	}
+#endif
+}
+
 static int gen_get_link_speed(int phy_addr)
 {
 	u_int16_t	tmp;
 
-	if (davinci_eth_phy_read(phy_addr, MII_STATUS_REG, &tmp) && (tmp & 0x04))
+	if (davinci_eth_phy_read(phy_addr, MII_STATUS_REG, &tmp) && (tmp & 0x04)) {
+		enable_gig_mode(phy_addr);
 		return(1);
+	}
 
 	return(0);
 }

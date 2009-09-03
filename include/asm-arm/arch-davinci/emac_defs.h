@@ -98,12 +98,20 @@
 /* EMAC Teardown value */
 #define EMAC_TEARDOWN_VALUE		0xfffffffc
 
-/* MII Status Register */
+/* MII Registers: Mostly specific to ET1011C PHY on Dm6467 EVM */
 #define MII_STATUS_REG			1
+#define MII_PHY_CONFIG_REG		22
+#define MII_PHY_STATUS_REG		26
 
 /* Number of statistics registers */
 #define EMAC_NUM_STATS			36
 
+/* PHY Status bits */
+#define PHY_SPEED_MASK			(3 << 8)
+#define PHY_SPEED_1000			(2 << 8)
+
+/* PHY Config bits */
+#define PHY_SYS_CLK_EN			(1 << 4)
 
 /* EMAC Descriptor */
 typedef volatile struct _emac_desc
