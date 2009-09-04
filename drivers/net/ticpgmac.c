@@ -332,7 +332,7 @@ static int gen_auto_negotiate(int phy_addr)
 	do{
 		udelay(40000);
 		cntr++;
-		}while(cntr < 50 );
+		}while(cntr < 150 );
 
 	if (!cpgmac_eth_phy_read(phy_addr, PHY_BMSR, &tmp))
 		return(0);
