@@ -24,7 +24,7 @@ extern int eth_hw_init(void);
 /* Set default clock ref value so that it can be used during timer init. Will
  * get overridden by environment variable value (if set) in misc_init_r().
  */
-static int clkref = CFG_REFCLK_FREQ;
+static unsigned int clkref = CFG_REFCLK_FREQ;
 
 /* Register addresses
  * TODO: Move these to hardware.h?
@@ -153,46 +153,14 @@ int board_init (void)
 	return 0;
 }
 
-/*
- * Note: These functions should really be in dm6467 Soc/ or davinci family
- * specific file (inside cpu/arm926ejs/davinci). Kept here for now to avoid
- * modifying common file(s).
+/* davinci_evm_refclk_in -
+ * 	Returns the CLKIN/OSCIN frequency input to DM64x device. The value is
+ * 	either specified build time of used from environment variable accessed
+ * 	during misc_init_r.
  */
-
-/* davinci_arm_clk_get -
- * 	Calculate and return the clock rate input to ARM by reading PLL
- * 	configuration.
- */
-int davinci_arm_clk_get()
+unsigned int davinci_evm_refclk_in()
 {
-	int pre_div, pllm, clk = clkref;
-
-	pre_div	= (REG(PLL1_PREDIV) & 0xff) + 1;
-	pllm	= REG(PLL1_PLLM)  + 1;
-
-	clk /= pre_div;
-	clk *= pllm;
-
-	clk /= ((REG(PLL1_DIV2)) & 0xff) + 1;
-	return clk;
-}
-
-/* davinci_ddr_clk_get -
- * 	Calculate and return the DDR PHY clock rate by reading PLL
- * 	configuration.
- */
-int davinci_ddr_clk_get(void)
-{
-	int pre_div, pllm, clk = clkref;
-
-	pre_div	= (REG(PLL2_PREDIV) & 0xff) + 1;
-	pllm	= REG(PLL2_PLLM)  + 1;
-
-	clk /= pre_div;
-	clk *= pllm;
-
-	clk /= ((REG(PLL2_DIV1)) & 0xff) + 1;
-	return clk;
+	return clkref;
 }
 
 /*

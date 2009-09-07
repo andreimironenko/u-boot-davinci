@@ -60,8 +60,13 @@
 #define DDR_PLLDIV	PLLC_PLLDIV1
 #endif
 
+#ifdef CONFIG_SOC_DM646X
+#define DSP_PLLDIV	PLLC_PLLDIV1
+#define ARM_PLLDIV	PLLC_PLLDIV2
+#define DDR_PLLDIV	PLLC_PLLDIV1
+#endif
 
-#ifdef CONFIG_DISPLAY_CPUINFO
+#if defined CONFIG_DISPLAY_CPUINFO || defined CONFIG_SOC_DM646X
 
 static unsigned pll_div(volatile void *pllbase, unsigned offset)
 {
@@ -97,7 +102,11 @@ static inline unsigned pll_postdiv(volatile void *pllbase)
 static unsigned pll_sysclk_mhz(unsigned pll_addr, unsigned div)
 {
 	volatile void	*pllbase = (volatile void *) pll_addr;
+#ifdef CONFIG_SOC_DM646X
+	unsigned	base = davinci_evm_refclk_in() / 1000;
+#else
 	unsigned	base = CONFIG_SYS_HZ_CLOCK / 1000;
+#endif
 
 	/* the PLL might be bypassed */
 	if (REG(pllbase + PLLC_PLLCTL) & BIT(0)) {
@@ -108,6 +117,17 @@ static unsigned pll_sysclk_mhz(unsigned pll_addr, unsigned div)
 	return DIV_ROUND_UP(base, 1000 * pll_div(pllbase, div));
 }
 
+unsigned int davinci_arm_clk_get()
+{
+	return pll_sysclk_mhz(DAVINCI_PLL_CNTRL0_BASE, ARM_PLLDIV) * 1000000;
+}
+
+unsigned int davinci_ddr_clk_get()
+{
+	return pll_sysclk_mhz(DAVINCI_PLL_CNTRL0_BASE, DDR_PLLDIV) * 1000000;
+}
+
+#if defined CONFIG_DISPLAY_CPUINFO
 int print_cpuinfo(void)
 {
 	/* REVISIT fetch and display CPU ID and revision information
@@ -128,7 +148,8 @@ int print_cpuinfo(void)
 	return 0;
 }
 
-#endif
+#endif /* CONFIG_DISPLAY_CPUINFO */
+#endif /* CONFIG_DISPLAY_CPUINFO || CONFIG_SOC_DM646X */
 
 /*
  * Initializes on-chip ethernet controllers.
