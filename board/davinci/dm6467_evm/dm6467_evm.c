@@ -202,11 +202,6 @@ int misc_init_r (void)
 	/* enable the ITCM and DTCM */
 	enable_tcm_cp15();
 
-#ifdef CFG_PCI_BOOT
-	/* Use the following command to run a boot script at run time */
-	setenv ("bootcmd", "autoscr 0x82080000");
-#endif	/* CFG_PCI_BOOT */
-
 	return (0);
 }
 
@@ -223,11 +218,3 @@ int dram_init (void)
 
 	return 0;
 }
-
-#ifdef CFG_PCI_BOOT
-char * env_name_spec = "nowhere";
-int saveenv (void)
-{
-	return 0;
-}
-#endif	/* CFG_PCI_BOOT */
