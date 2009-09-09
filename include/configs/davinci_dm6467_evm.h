@@ -21,8 +21,9 @@
 /* Board */
 /*=======*/
 #define CFG_DM6467_EVM
-#define CONFIG_SYS_NAND_SMALLPAGE
 #define CONFIG_SYS_USE_NAND
+#define CONFIG_SYS_NAND_SMALLPAGE
+
 /*===================*/
 /* SoC Configuration */
 /*===================*/
@@ -107,10 +108,10 @@ extern unsigned int davinci_evm_refclk_in(void);
 /*=====================*/
 /* Flash & Environment */
 /*=====================*/
+#define CONFIG_SYS_NO_FLASH
 #ifdef CONFIG_SYS_USE_NAND
 #define CONFIG_NAND_DAVINCI
 #undef CONFIG_ENV_IS_IN_FLASH
-#define CONFIG_SYS_NO_FLASH
 #define CONFIG_ENV_IS_IN_NAND		/* U-Boot env in NAND Flash  */
 #ifdef CONFIG_SYS_NAND_SMALLPAGE
 #define CONFIG_ENV_SECT_SIZE	512	/* Env sector Size */
@@ -119,8 +120,6 @@ extern unsigned int davinci_evm_refclk_in(void);
 #define CONFIG_ENV_SECT_SIZE	2048	/* Env sector Size */
 #define CONFIG_ENV_SIZE		SZ_128K
 #endif
-#define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is loaded by a bootloader */
-#define CONFIG_SKIP_RELOCATE_UBOOT	/* to a proper address, init done */
 #define CONFIG_SYS_NAND_BASE		0x42000000
 #define CONFIG_SYS_NAND_HW_ECC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1	/* Max number of NAND devices */
@@ -128,6 +127,9 @@ extern unsigned int davinci_evm_refclk_in(void);
 #define	CONFIG_MASK_ALE			0x40000
 #define CONFIG_ENV_OFFSET		0	/* Block 0--not used by bootcode */
 #define DEF_BOOTM		""
+#else
+#define CONFIG_ENV_IS_NOWHERE
+#define CONFIG_ENV_SIZE		SZ_4K
 #endif
 
 /*
@@ -143,8 +145,10 @@ extern unsigned int davinci_evm_refclk_in(void);
 /*==============================*/
 #undef	CONFIG_USE_IRQ			/* No IRQ/FIQ in U-Boot */
 #define CONFIG_MISC_INIT_R
+#define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is loaded by a bootloader */
+#define CONFIG_SKIP_RELOCATE_UBOOT	/* to a proper address, init done */
 #undef CONFIG_BOOTDELAY
-#define CONFIG_BOOTFILE		"uImage"	/* Boot file name */
+#define CONFIG_BOOTFILE			"uImage"	/* Boot file name */
 #define CONFIG_SYS_PROMPT		"DM6467 EVM > "	/* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		1024		/* Console I/O Buffer Size  */
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)	/* Print buffer sz */
@@ -162,11 +166,15 @@ extern unsigned int davinci_evm_refclk_in(void);
 /*===================*/
 /* Linux Information */
 /*===================*/
-#define LINUX_BOOT_PARAM_ADDR	0x80000100
+#define LINUX_BOOT_PARAM_ADDR		0x80000100
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_BOOTARGS		"mem=120M console=ttyS0,115200n8 root=/dev/hda1 rw noinitrd ip=dhcp"
-#define CONFIG_BOOTCOMMAND	"dhcp; bootm"
+#ifdef CONFIG_ENV_IS_NOWHERE
+#define CONFIG_BOOTCOMMAND   		"autoscr 0x82080000"
+#else
+#define CONFIG_BOOTARGS			"mem=120M console=ttyS0,115200n8 root=/dev/hda1 rw noinitrd ip=dhcp"
+#define CONFIG_BOOTCOMMAND		"dhcp; bootm"
+#endif
 /*=================*/
 /* U-Boot commands */
 /*=================*/
