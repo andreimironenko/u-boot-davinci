@@ -124,7 +124,7 @@ unsigned int davinci_arm_clk_get()
 
 unsigned int davinci_ddr_clk_get()
 {
-	return pll_sysclk_mhz(DAVINCI_PLL_CNTRL0_BASE, DDR_PLLDIV) * 1000000;
+	return pll_sysclk_mhz(DAVINCI_PLL_CNTRL1_BASE, DDR_PLLDIV) * 1000000;
 }
 
 #if defined CONFIG_DISPLAY_CPUINFO
