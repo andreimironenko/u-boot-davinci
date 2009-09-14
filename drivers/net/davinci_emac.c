@@ -390,9 +390,10 @@ static int davinci_eth_open(struct eth_device *dev, bd_t *bis)
 	/* Init MDIO & get link state */
 	clkdiv = (EMAC_MDIO_BUS_FREQ / EMAC_MDIO_CLOCK_FREQ) - 1;
 	adap_mdio->CONTROL = ((clkdiv & 0xff) | MDIO_CONTROL_ENABLE | MDIO_CONTROL_FAULT);
+	udelay(1000); /* wait 1 ms for MDIO to start-up */
 
 	if (!phy.get_link_speed(active_phy_addr))
-		return(0);
+		printf ("WARN: emac_open: No link\n");
 
 	/* Start receive process */
 	adap_emac->RX0HDP = (u_int32_t)emac_rx_desc;
