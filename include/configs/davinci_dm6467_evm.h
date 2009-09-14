@@ -147,7 +147,7 @@ extern unsigned int davinci_evm_refclk_in(void);
 #define CONFIG_MISC_INIT_R
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is loaded by a bootloader */
 #define CONFIG_SKIP_RELOCATE_UBOOT	/* to a proper address, init done */
-#undef CONFIG_BOOTDELAY
+#define CONFIG_BOOTDELAY		3
 #define CONFIG_BOOTFILE			"uImage"	/* Boot file name */
 #define CONFIG_SYS_PROMPT		"DM6467 EVM > "	/* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		1024		/* Console I/O Buffer Size  */
