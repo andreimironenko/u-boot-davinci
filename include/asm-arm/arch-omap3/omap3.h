@@ -105,6 +105,10 @@ typedef struct gpio {
 } gpio_t;
 #endif /* __ASSEMBLY__ */
 
+#define GPIO_OE                         0x34
+#define GPIO_CLEARDATAOUT               0x90
+#define GPIO_SETDATAOUT                 0x94
+
 #define GPIO0				(0x1 << 0)
 #define GPIO1				(0x1 << 1)
 #define GPIO2				(0x1 << 2)

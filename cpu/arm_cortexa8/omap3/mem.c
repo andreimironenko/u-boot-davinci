@@ -31,6 +31,8 @@
 #include <asm/arch/sys_proto.h>
 #include <command.h>
 
+#ifdef CONFIG_OMAP35XX
+
 /* Definitions for EMIF4 configuration values */
 #define EMIF4_TIM1_T_RP         0x3
 #define EMIF4_TIM1_T_RCD        0x3
@@ -84,6 +86,7 @@
 #define EMIF4_DDR1_DLL_MODE     0x0
 #define EMIF4_DDR1_VTP_DYN	0x1
 #define EMIF4_DDR1_LB_CK_SEL    0x0
+#endif
 
 /*
  * Only One NAND allowed on board at a time.
@@ -141,7 +144,6 @@ gpmc_csx_t *onenand_cs_base;
 #endif
 
 static sdrc_t *sdrc_base = (sdrc_t *)OMAP34XX_SDRC_BASE;
-static emif4_t *emif4_base = (emif4_t *)OMAP34XX_SDRC_BASE;
 
 /**************************************************************************
  * make_cs1_contiguous() - for es2 and above remap cs1 behind cs0 to allow
@@ -254,6 +256,8 @@ void do_sdrc_init(u32 cs, u32 early)
 		writel(0, &sdrc_base->cs[cs].mcfg);
 }
 
+#ifdef CONFIG_OMAP35XX
+static emif4_t *emif4_base = (emif4_t *)OMAP34XX_SDRC_BASE;
 unsigned long calc_size_from_emif4(int cs)
 {
 	unsigned int size;
@@ -339,6 +343,7 @@ void emif4_init(void)
 		(EMIF4_CFG_IBANK_POS << 27) | (EMIF4_CFG_SDRAM_TYP << 29));
 	writel(regval, &emif4_base->sdram_config);
 }
+#endif
 
 void enable_gpmc_config(u32 *gpmc_config, gpmc_csx_t *gpmc_cs_base, u32 base,
 			u32 size)

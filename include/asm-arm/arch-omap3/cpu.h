@@ -25,6 +25,8 @@
 #ifndef _CPU_H
 #define _CPU_H
 
+#define OFFS(x)                         ((x) >> 2)
+
 /* Register offsets of common modules */
 /* Control */
 #ifndef __ASSEMBLY__
