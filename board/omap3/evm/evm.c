@@ -64,6 +64,7 @@ static int omap3evm_board_rev(void)
         *      GEN_2   = 0x92200000
         */
        smsc_id = readl(CONFIG_DRIVER_SMC911X_BASE + 0x50) & 0xFFFF0000;
+       printf("Read bck SMSC id 0x%x\n",smsc_id);
 
        switch (smsc_id) {
        /*SMSC9115 chipset*/
