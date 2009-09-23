@@ -15,6 +15,7 @@
 
 #include <common.h>
 #include <i2c.h>
+#include <nand.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/i2c_defs.h>
 
@@ -217,4 +218,20 @@ int dram_init (void)
 	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
 
 	return 0;
+}
+
+int board_nand_init(struct nand_chip *chip)
+{
+       DECLARE_GLOBAL_DATA_PTR;
+       extern void davinci_nand_init(struct nand_chip *);
+
+       /* Initialize NAND only if PCI is not selected in PINMUX0 */
+       if ((REG(PINMUX0) & 0x4) == 0) {
+               davinci_nand_init(chip);
+               return 0;
+       } else {
+               gd->env_valid = 0;
+               puts("*** NO NAND ACCESS (PCI Enabled): ");
+               return -1;
+       }
 }
