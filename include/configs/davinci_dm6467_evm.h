@@ -169,12 +169,8 @@ extern unsigned int davinci_evm_refclk_in(void);
 #define LINUX_BOOT_PARAM_ADDR		0x80000100
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
-#ifdef CONFIG_ENV_IS_NOWHERE
-#define CONFIG_BOOTCOMMAND   		"autoscr 0x82080000"
-#else
+#define CONFIG_BOOTCOMMAND   		"source 0x82080000; dhcp; bootm"
 #define CONFIG_BOOTARGS			"mem=120M console=ttyS0,115200n8 root=/dev/hda1 rw noinitrd ip=dhcp"
-#define CONFIG_BOOTCOMMAND		"dhcp; bootm"
-#endif
 /*=================*/
 /* U-Boot commands */
 /*=================*/
