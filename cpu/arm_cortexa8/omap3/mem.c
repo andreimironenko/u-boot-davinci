@@ -81,10 +81,10 @@
  * EMIF4 PHY Control 1 register configuration
  */
 #define EMIF4_DDR1_READ_LAT	0x6
-#define EMIF4_DDR1_PWRDN_DIS    0x1
-#define EMIF4_DDR1_STRBEN_EXT   0x1
+#define EMIF4_DDR1_PWRDN_DIS    0x0
+#define EMIF4_DDR1_STRBEN_EXT   0x0
 #define EMIF4_DDR1_DLL_MODE     0x0
-#define EMIF4_DDR1_VTP_DYN	0x1
+#define EMIF4_DDR1_VTP_DYN	0x0
 #define EMIF4_DDR1_LB_CK_SEL    0x0
 #endif
 
@@ -284,7 +284,7 @@ void emif4_init(void)
 {
 	unsigned int regval;
 	/* Set the DDR PHY parameters in PHY ctrl registers */
-	regval = (EMIF4_DDR1_READ_LAT | (EMIF4_DDR1_VTP_DYN << 15) |
+	regval = (EMIF4_DDR1_READ_LAT | (EMIF4_DDR1_PWRDN_DIS << 6) |
 		(EMIF4_DDR1_STRBEN_EXT << 7) | (EMIF4_DDR1_DLL_MODE << 12) |
 		(EMIF4_DDR1_VTP_DYN << 15) | (EMIF4_DDR1_LB_CK_SEL << 23));
 	writel(regval, &emif4_base->ddr_phyctrl1);
