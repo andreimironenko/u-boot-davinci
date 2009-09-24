@@ -152,7 +152,6 @@ static void setup_net_chip(void)
 	writel(readl(&gpio1_base->oe) & ~(GPIO30), &gpio1_base->oe);
 
 	/* Now send a pulse on the GPIO pin */
-	printf("Driving GPIO 30 low \n");
 	writel(GPIO30, &gpio1_base->cleardataout);
 	ctr  = 0;
 	do{
@@ -160,7 +159,6 @@ static void setup_net_chip(void)
 		ctr++;
 		}while (ctr <300);
 		
-	printf("Driving GPIO 30 high \n");
 	writel(GPIO30, &gpio1_base->setdataout);
 	ctr =0;
 	/* allow the PHY to stabilize and settle down */

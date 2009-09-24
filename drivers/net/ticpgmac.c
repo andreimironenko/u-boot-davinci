@@ -441,10 +441,7 @@ static int cpgmac_eth_hw_init(void)
 
 	/* Override HW configuration value that were latched */
 	cpgmac_eth_phy_read(active_phy_addr, SPL_VEND_REG, &tmp);
-	printf("read HW config for PHY 0x%x\n",tmp);
-//	tmp |= (1 << 14) | ( 7 << 5) ;
 	tmp = 0x60e0;
-	printf("Program HW config as 0x%x \n",tmp);
 	cpgmac_eth_phy_write(active_phy_addr,SPL_VEND_REG,tmp);
 
 	/* Soft reset the PHY */
