@@ -32,6 +32,10 @@
 #include <i2c.h>
 
 extern omap3_sysinfo sysinfo;
+
+#if defined (CONFIG_OMAP35XX)
+extern unsigned long calc_size_from_emif4(int cs);
+#endif
 static gpmc_csx_t *gpmc_cs_base = (gpmc_csx_t *)GPMC_CONFIG_CS0_BASE;
 static sdrc_t *sdrc_base = (sdrc_t *)OMAP34XX_SDRC_BASE;
 static ctrl_t *ctrl_base = (ctrl_t *)OMAP34XX_CTRL_BASE;

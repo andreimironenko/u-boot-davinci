@@ -36,6 +36,8 @@
 #include <asm/mach-types.h>
 #include "omap3517evm.h"
 
+extern int eth_hw_init(void);
+
 /******************************************************************************
  * Routine: board_init
  * Description: Early hardware init.
@@ -110,7 +112,7 @@ void set_muxconf_regs(void)
  *****************************************************************************/
 static void setup_net_chip(void)
 {
-	#if 0
+#if 0
 	gpio_t *gpio3_base = (gpio_t *)OMAP34XX_GPIO3_BASE;
 	gpmc_csx_t *gpmc_cs6_base = (gpmc_csx_t *)GPMC_CONFIG_CS6_BASE;
 	ctrl_t *ctrl_base = (ctrl_t *)OMAP34XX_CTRL_BASE;
@@ -141,12 +143,11 @@ static void setup_net_chip(void)
 	writel(GPIO0, &gpio3_base->cleardataout);
 	udelay(1);
 	writel(GPIO0, &gpio3_base->setdataout);
-	#else
+#else
 	volatile unsigned int ctr;
-	
+
 	gpio_t *gpio1_base = (gpio_t *)OMAP34XX_GPIO1_BASE;
-	ctrl_t *ctrl_base = (ctrl_t *)OMAP34XX_CTRL_BASE;
-	
+
 
 	/* Make GPIO 30 as output pin */
 	writel(readl(&gpio1_base->oe) & ~(GPIO30), &gpio1_base->oe);
@@ -158,7 +159,7 @@ static void setup_net_chip(void)
 		udelay(1000);
 		ctr++;
 		}while (ctr <300);
-		
+
 	writel(GPIO30, &gpio1_base->setdataout);
 	ctr =0;
 	/* allow the PHY to stabilize and settle down */
@@ -166,6 +167,6 @@ static void setup_net_chip(void)
 		udelay(1000);
 		ctr++;
 		}while (ctr <300);
-	
-	#endif
+
+#endif
 }
