@@ -322,19 +322,19 @@ static void setup_net_chip(void);
  MUX_VAL(CP(ETK_D14_ES2),	(IEN  | PTD | DIS | M0)) /*ETK_D14*/\
  MUX_VAL(CP(ETK_D15_ES2),	(IEN  | PTD | DIS | M0)) /*ETK_D15*/\
  /*Die to Die */\
- MUX_VAL(CP(CCDC_PCLK),		(IEN  | PTD | EN  | M0)) /*ccdc_pclk*/\
- MUX_VAL(CP(CCDC_FIELD),	(IEN  | PTD | EN  | M0)) /*ccdc_field*/\
- MUX_VAL(CP(CCDC_HD),		(IEN  | PTD | EN  | M0)) /*ccdc_hd*/\
- MUX_VAL(CP(CCDC_VD),		(IEN  | PTD | EN  | M0)) /*ccdc_vd*/\
- MUX_VAL(CP(CCDC_WEN),		(IEN  | PTD | EN  | M0)) /*ccdc_wen*/\
- MUX_VAL(CP(CCDC_DATA0),	(IEN  | PTD | EN  | M0)) /*ccdc_data0*/\
- MUX_VAL(CP(CCDC_DATA1),        (IEN  | PTD | EN  | M0)) /*ccdc_data1*/\
- MUX_VAL(CP(CCDC_DATA2),	(IEN  | PTD | EN  | M0)) /*ccdc_data2*/\
- MUX_VAL(CP(CCDC_DATA3),	(IEN  | PTD | EN  | M0)) /*ccdc_data3*/\
- MUX_VAL(CP(CCDC_DATA4),	(IEN  | PTD | EN  | M0)) /*ccdc_data4*/\
- MUX_VAL(CP(CCDC_DATA5),	(IEN  | PTD | EN  | M0)) /*ccdc_data5*/\
- MUX_VAL(CP(CCDC_DATA6),	(IEN  | PTD | EN  | M0)) /*ccdc_data6*/\
- MUX_VAL(CP(CCDC_DATA7),	(IEN  | PTD | EN  | M0)) /*ccdc_data7*/\
+ MUX_VAL(CP(CCDC_PCLK),		(IEN  | PTU | EN  | M0)) /*ccdc_pclk*/\
+ MUX_VAL(CP(CCDC_FIELD),	(IEN  | PTD | DIS  | M1)) /*ccdc_field*/\
+ MUX_VAL(CP(CCDC_HD),		(IEN  | PTU | EN  | M0)) /*ccdc_hd*/\
+ MUX_VAL(CP(CCDC_VD),		(IEN  | PTU | EN  | M0)) /*ccdc_vd*/\
+ MUX_VAL(CP(CCDC_WEN),		(IEN  | PTD | DIS  | M1)) /*ccdc_wen*/\
+ MUX_VAL(CP(CCDC_DATA0),	(IEN  | PTD | DIS | M0)) /*ccdc_data0*/\
+ MUX_VAL(CP(CCDC_DATA1),        (IEN  | PTD | DIS | M0)) /*ccdc_data1*/\
+ MUX_VAL(CP(CCDC_DATA2),	(IEN  | PTD | DIS | M0)) /*ccdc_data2*/\
+ MUX_VAL(CP(CCDC_DATA3),	(IEN  | PTD | DIS | M0)) /*ccdc_data3*/\
+ MUX_VAL(CP(CCDC_DATA4),	(IEN  | PTD | DIS | M0)) /*ccdc_data4*/\
+ MUX_VAL(CP(CCDC_DATA5),	(IEN  | PTD | DIS | M0)) /*ccdc_data5*/\
+ MUX_VAL(CP(CCDC_DATA6),	(IEN  | PTD | DIS | M0)) /*ccdc_data6*/\
+ MUX_VAL(CP(CCDC_DATA7),	(IEN  | PTD | DIS | M0)) /*ccdc_data7*/\
  MUX_VAL(CP(RMII_MDIO_DATA),	(IEN  |  M0)) /*rmii_mdio_data*/\
  MUX_VAL(CP(RMII_MDIO_CLK),	(M0)) /*rmii_mdio_clk*/\
  MUX_VAL(CP(RMII_RXD0)	,	(IEN  | PTD | M0)) /*rmii_rxd0*/\
