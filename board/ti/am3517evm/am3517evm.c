@@ -54,6 +54,7 @@ int board_init(void)
  */
 int misc_init_r(void)
 {
+	unsigned char byte;
 
 #ifdef CONFIG_DRIVER_OMAP34XX_I2C
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
@@ -61,6 +62,21 @@ int misc_init_r(void)
 
 	dieid_num_r();
 
+#if defined(CONFIG_CMD_I2C)
+	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
+	/* Set i2C exapander u20 for HECC signal CAN_STB to low */
+	byte = 0xFF;
+	i2c_read(0x21, 0, 0, &byte, 1);
+	printf("HECC U20: port before = %08X\n", byte);
+	byte = 0xBF;
+	i2c_write(0x21, 6, 0, &byte, 1);
+	byte = 0x0;
+	i2c_write(0x21, 2, 0, &byte, 1);
+	printf("HECC U20: programmed CAN_STB low\n");
+	byte = 0xFF;
+	i2c_read(0x21, 0, 0, &byte, 1);
+	printf("HECC U20: port after = %08X\n", byte);
+#endif
 	return 0;
 }
 
