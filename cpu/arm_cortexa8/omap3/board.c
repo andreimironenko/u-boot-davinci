@@ -227,7 +227,11 @@ void s_init(void)
 	per_clocks_enable();
 
 	if (!in_sdram)
+#if defined(CONFIG_SDRC)
 		sdrc_init();
+#elif defined(CONFIG_EMIF4)
+		emif4_init();
+#endif
 }
 
 /******************************************************************************
@@ -276,18 +280,19 @@ int dram_init(void)
 	DECLARE_GLOBAL_DATA_PTR;
 	unsigned int size0 = 0, size1 = 0;
 
+	size0 = get_sdr_cs_size(CS0);
 	/*
 	 * If a second bank of DDR is attached to CS1 this is
 	 * where it can be started.  Early init code will init
 	 * memory on CS0.
 	 */
 	if ((sysinfo.mtype == DDR_COMBO) || (sysinfo.mtype == DDR_STACKED)) {
+#if defined(CONFIG_SDRC)
 		do_sdrc_init(CS1, NOT_EARLY);
 		make_cs1_contiguous();
+#endif
+		size1 = get_sdr_cs_size(CS1);
 	}
-
-	size0 = get_sdr_cs_size(CS0);
-	size1 = get_sdr_cs_size(CS1);
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
 	gd->bd->bi_dram[0].size = size0;

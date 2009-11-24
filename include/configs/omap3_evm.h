@@ -75,6 +75,10 @@
 /*
  * Hardware drivers
  */
+/*
+ * Support for SDRC
+ */
+#define CONFIG_SDRC			1
 
 /*
  * NS16550 Configuration

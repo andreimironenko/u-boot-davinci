@@ -90,6 +90,11 @@
 #define CONFIG_OMAP3_MMC		1
 #define CONFIG_DOS_PARTITION		1
 
+/*
+ * Support for SDRC
+ */
+#define CONFIG_SDRC			1
+
 /* commands to include */
 #include <config_cmd_default.h>
 

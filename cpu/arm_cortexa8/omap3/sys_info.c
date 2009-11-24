@@ -109,8 +109,10 @@ u32 get_cpu_rev(void)
  ****************************************************/
 u32 is_mem_sdr(void)
 {
+#if defined(CONFIG_SDRC)
 	if (readl(&sdrc_base->cs[CS0].mr) == SDP_SDRC_MR_0_SDR)
 		return 1;
+#endif
 	return 0;
 }
 
@@ -121,10 +123,16 @@ u32 get_sdr_cs_size(u32 cs)
 {
 	u32 size;
 
+#if defined(CONFIG_EMIF4)
+	/* TODO: Calculate the size based on EMIF4 configuration */
+	size = CONFIG_SYS_CS0_SIZE;
+#elif defined(CONFIG_SDRC)
 	/* get ram size field */
 	size = readl(&sdrc_base->cs[cs].mcfg) >> 8;
 	size &= 0x3FF;		/* remove unwanted bits */
 	size *= SZ_2M;		/* find size in MB */
+#endif
+
 	return size;
 }
 
@@ -133,13 +141,15 @@ u32 get_sdr_cs_size(u32 cs)
  ************************************************************************/
 u32 get_sdr_cs_offset(u32 cs)
 {
-	u32 offset;
+	u32 offset = 0;
 
 	if (!cs)
 		return 0;
 
+#if defined(CONFIG_SDRC)
 	offset = readl(&sdrc_base->cs_cfg);
 	offset = (offset & 15) << 27 | (offset & 0x30) >> 17;
+#endif
 
 	return offset;
 }

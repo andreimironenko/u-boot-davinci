@@ -99,6 +99,11 @@
 #define CONFIG_OMAP3_MMC		1
 #define CONFIG_DOS_PARTITION		1
 
+/*
+ * Support for SDRC
+ */
+#define CONFIG_SDRC			1
+
 /* Status LED */
 #define CONFIG_STATUS_LED		1 /* Status LED enabled	*/
 #define CONFIG_BOARD_SPECIFIC_LED	1
