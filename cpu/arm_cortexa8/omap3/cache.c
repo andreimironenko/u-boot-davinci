@@ -41,7 +41,8 @@ void l2_cache_enable(void)
 	volatile unsigned int j;
 
 	/* ES2 onwards we can disable/enable L2 ourselves */
-	if (get_cpu_rev() >= CPU_3XX_ES20) {
+	if ((is_cpu_family(CPU_OMAP34XX) && (get_cpu_rev() >= CPU_3XX_ES20)) ||
+		(is_cpu_family(CPU_AM35XX))) {
 		__asm__ __volatile__("mrc p15, 0, %0, c1, c0, 1":"=r"(i));
 		__asm__ __volatile__("orr %0, %0, #0x2":"=r"(i));
 		__asm__ __volatile__("mcr p15, 0, %0, c1, c0, 1":"=r"(i));
@@ -71,7 +72,8 @@ void l2_cache_disable(void)
 	volatile unsigned int j;
 
 	/* ES2 onwards we can disable/enable L2 ourselves */
-	if (get_cpu_rev() >= CPU_3XX_ES20) {
+	if ((is_cpu_family(CPU_OMAP34XX) && (get_cpu_rev() >= CPU_3XX_ES20)) ||
+		(is_cpu_family(CPU_AM35XX))) {
 		__asm__ __volatile__("mrc p15, 0, %0, c1, c0, 1":"=r"(i));
 		__asm__ __volatile__("bic %0, %0, #0x2":"=r"(i));
 		__asm__ __volatile__("mcr p15, 0, %0, c1, c0, 1":"=r"(i));
