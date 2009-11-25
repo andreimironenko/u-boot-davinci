@@ -30,6 +30,8 @@
 #define __CONFIG_H
 #include <asm/sizes.h>
 
+#define CONFIG_ARCH_CPU_INIT	1
+
 /*
  * High Level Configuration Options
  */
