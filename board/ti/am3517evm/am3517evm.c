@@ -67,24 +67,6 @@ int misc_init_r(void)
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
 #endif
 
-	dieid_num_r();
-
-#if defined(CONFIG_CMD_I2C)
-	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
-	/* Set i2C exapander u20 for HECC signal CAN_STB to low */
-	byte = 0xFF;
-	i2c_read(0x21, 0, 0, &byte, 1);
-	printf("HECC U20: port before = %08X\n", byte);
-	byte = 0xBF;
-	i2c_write(0x21, 6, 0, &byte, 1);
-	byte = 0x0;
-	i2c_write(0x21, 2, 0, &byte, 1);
-	printf("HECC U20: programmed CAN_STB low\n");
-	byte = 0xFF;
-	i2c_read(0x21, 0, 0, &byte, 1);
-	printf("HECC U20: port after = %08X\n", byte);
-#endif
-
 #if defined(CONFIG_DRIVER_TI_EMAC)
 
 	omap_request_gpio(30);
@@ -109,6 +91,23 @@ int misc_init_r(void)
 	writel(reset,AM3517_IP_SW_RESET);
 
 #endif
+
+#if defined(CONFIG_CMD_I2C)
+	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
+	/* Set i2C exapander u20 for HECC signal CAN_STB to low */
+	byte = 0xFF;
+	i2c_read(0x21, 0, 0, &byte, 1);
+	printf("HECC U20: port before = %08X\n", byte);
+	byte = 0xBF;
+	i2c_write(0x21, 6, 0, &byte, 1);
+	byte = 0x0;
+	i2c_write(0x21, 2, 0, &byte, 1);
+	printf("HECC U20: programmed CAN_STB low\n");
+	byte = 0xFF;
+	i2c_read(0x21, 0, 0, &byte, 1);
+	printf("HECC U20: port after = %08X\n", byte);
+#endif
+	dieid_num_r();
 
 	return 0;
 }
