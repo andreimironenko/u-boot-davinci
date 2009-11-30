@@ -50,7 +50,6 @@ static void omap3_evm_get_revision(void)
 
 	/* Ethernet PHY ID is stored at ID_REV register */
 	smsc_id = readl(CONFIG_SMC911X_BASE + 0x50) & 0xFFFF0000;
-	printf("Read back SMSC id 0x%x\n", smsc_id);
 
 	switch (smsc_id) {
 	/* SMSC9115 chipset */
