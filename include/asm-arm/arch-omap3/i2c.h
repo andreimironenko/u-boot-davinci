@@ -23,7 +23,11 @@
 #ifndef _I2C_H_
 #define _I2C_H_
 
+#if defined(CONFIG_OMAP3_EVM)
+#define I2C_DEFAULT_BASE	I2C_BASE1
+#elif defined(CONFIG_OMAP3_AM3517EVM)
 #define I2C_DEFAULT_BASE	I2C_BASE3
+#endif
 
 #define I2C_REV		(I2C_DEFAULT_BASE + 0x00)
 #define I2C_IE 		(I2C_DEFAULT_BASE + 0x04)
