@@ -42,6 +42,7 @@ void gpmc_init(void);
 void watchdog_init(void);
 void set_muxconf_regs(void);
 
+void cpu_identify(void);
 u8 is_cpu_family(u16);
 u8 get_cpu_rev(void);
 u32 get_mem_type(void);

@@ -193,6 +193,8 @@ void s_init(void)
 {
 	int in_sdram = is_running_in_sdram();
 
+	cpu_identify();
+
 	watchdog_init();
 
 	try_unlock_memory();

@@ -48,11 +48,11 @@ static u8  cpu_revision;
 static u32 get_cpu_type(void);
 
 /**
- * Perform architecture specific initialization.
+ * Identify the silicon.
  *
  * It identifies the cpu family, exact cpu and silicon revision.
  */
-int arch_cpu_init (void)
+void cpu_identify(void)
 {
 	u32 cpuid = 0;
 	u32 cputype;
@@ -142,17 +142,32 @@ int arch_cpu_init (void)
 			break;
 		}
 	}
-
-	return 0;
 }
 
-/*
+/**
  * Check if cpu belongs to specific family
  */
 u8 is_cpu_family(u16 family)
 {
 	if (cpu_family == family)
 		return 1;
+
+	return 0;
+}
+
+/**
+ * Perform architecture specific initialization
+ */
+int arch_cpu_init (void)
+{
+	/*
+	 * FIXME:
+	 *
+	 * The identification done in s_init seems to be 'lost' due to
+	 * relocation. The variable contents are not same. Function
+	 * cpu_identify() is called again as a workaround.
+	 */
+	cpu_identify();
 
 	return 0;
 }
