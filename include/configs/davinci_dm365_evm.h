@@ -129,8 +129,8 @@
 #define LINUX_BOOT_PARAM_ADDR	0x80000100
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_BOOTARGS		"mem=116M console=ttyS0,115200n8 root=/dev/ram0 rw noinitrd ip=dhcp"
-#define CONFIG_BOOTCOMMAND	"setenv setboot setenv bootargs \\$(bootargs) video=dm36xfb:output=\\$(videostd);run setboot; bootm 0x2050000"
+#define CONFIG_BOOTARGS		"mem=60M console=ttyS0,115200n8 root=/dev/mtdblock4 rw rootfstype=jffs2 ip=off video=davincifb:vid0=OFF:vid1=OFF:osd0=720x576x16,2025K dm365_imp.oper_mode=0"
+#define CONFIG_BOOTCOMMAND	"nboot.e 0x80700000 0 0x1000000;bootm"
 /*=================*/
 /* U-Boot commands */
 /*=================*/
