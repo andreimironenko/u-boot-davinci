@@ -45,13 +45,13 @@
  *
 #define CONFIG_NOR_UART_BOOT
  */
-
 /*=======*/
 /* Board */
 /*=======*/
 #define DV_EVM
 #define CONFIG_SYS_NAND_SMALLPAGE
-#define CONFIG_SYS_USE_NOR
+#undef	CONFIG_SYS_USE_NOR
+#define	CONFIG_SYS_USE_NAND
 /*===================*/
 /* SoC Configuration */
 /*===================*/
@@ -146,13 +146,14 @@
 #define CONFIG_FLASH_CFI_DRIVER
 #define CONFIG_SYS_FLASH_CFI
 #define CONFIG_SYS_MAX_FLASH_BANKS	1		/* max number of flash banks */
-#define CONFIG_SYS_FLASH_SECT_SZ	0x10000		/* 64KB sect size AMD Flash */
+#define CONFIG_SYS_FLASH_SECT_SZ	0x20000		/* 128KB sect size Intel Flash */
 #define CONFIG_ENV_OFFSET		(CONFIG_SYS_FLASH_SECT_SZ*3)
 #define PHYS_FLASH_1		0x02000000	/* CS2 Base address	 */
 #define CONFIG_SYS_FLASH_BASE		PHYS_FLASH_1	/* Flash Base for U-Boot */
-#define PHYS_FLASH_SIZE		0x2000000	/* Flash size 32MB	 */
-#define CONFIG_SYS_MAX_FLASH_SECT	(PHYS_FLASH_SIZE/CONFIG_SYS_FLASH_SECT_SZ)
+#define PHYS_FLASH_SIZE		0x1000000	/* Flash size 16MB	 */
+#define CONFIG_SYS_MAX_FLASH_SECT	512
 #define CONFIG_ENV_SECT_SIZE	CONFIG_SYS_FLASH_SECT_SZ	/* Env sector Size */
+#define CONFIG_SYS_FLASH_PROTECTION
 #endif
 /*==============================*/
 /* U-Boot general configuration */
