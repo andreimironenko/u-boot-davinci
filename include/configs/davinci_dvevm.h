@@ -160,7 +160,7 @@
 /*==============================*/
 #undef	CONFIG_USE_IRQ			/* No IRQ/FIQ in U-Boot */
 #define CONFIG_MISC_INIT_R
-#undef CONFIG_BOOTDELAY
+#define CONFIG_BOOTDELAY	3
 #define CONFIG_BOOTFILE		"uImage"	/* Boot file name */
 #define CONFIG_SYS_PROMPT		"U-Boot > "	/* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		1024		/* Console I/O Buffer Size  */
