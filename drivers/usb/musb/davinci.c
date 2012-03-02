@@ -42,11 +42,11 @@ struct davinci_usb_regs *dregs;
 static u8 phy_on(void)
 {
 	u32 timeout;
-#ifdef DAVINCI_DM365EVM
+#if defined(DAVINCI_DM365EVM) || defined(DAVINCI_DM365HTC)
 	u32 val;
 #endif
 	/* Wait until the USB phy is turned on */
-#ifdef DAVINCI_DM365EVM
+#if defined(DAVINCI_DM365EVM) || defined(DAVINCI_DM365HTC)
 	writel(USBPHY_PHY24MHZ | USBPHY_SESNDEN |
 			USBPHY_VBDTCTEN, USBPHY_CTL_PADDR);
 #else
@@ -54,7 +54,7 @@ static u8 phy_on(void)
 #endif
 	timeout = musb_cfg.timeout;
 
-#ifdef DAVINCI_DM365EVM
+#if defined(DAVINCI_DM365EVM) || defined(DAVINCI_DM365HTC)
 	/* Set the ownership of GIO33 to USB */
 	val = readl(PINMUX4);
 	val &= ~(PINMUX4_USBDRVBUS_BITCLEAR);
@@ -86,7 +86,7 @@ int musb_platform_init(void)
 	u32  revision;
 
 	/* enable USB VBUS */
-#ifndef DAVINCI_DM365EVM
+#if !defined(DAVINCI_DM365EVM) && !defined(DAVINCI_DM365HTC)
 	enable_vbus();
 #endif
 	/* start the on-chip USB phy and its pll */
