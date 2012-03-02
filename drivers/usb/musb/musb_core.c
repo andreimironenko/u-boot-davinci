@@ -44,7 +44,9 @@ void musb_start(void)
 	writeb(0, &musbr->testmode);
 
 	/* put into basic highspeed mode and start session */
+#ifndef CONFIG_MUSB_DISABLE_HIGHSPEED
 	writeb(MUSB_POWER_HSENAB, &musbr->power);
+#endif
 #if defined(CONFIG_MUSB_HCD)
 	/* Program PHY to use EXT VBUS if required */
 	if (musb_cfg.extvbus == 1) {
