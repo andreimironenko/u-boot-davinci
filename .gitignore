@@ -13,6 +13,9 @@
 *~
 *.swp
 *.patch
+tools/uflash/u-boot.bin
+tools/uflash/ubl.bin
+tools/uflash/uflash
 
 #
 # Top-level generic files

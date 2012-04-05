@@ -186,11 +186,22 @@
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
 
+
+#if 0
 #define CONFIG_BOOTDELAY	3
 #define CONFIG_BOOTCOMMAND	"if mmc rescan 0; then if fatload mmc 0 0x80600000 boot.scr; then source 0x80600000; else fatload mmc 0 0x80700000 uImage; bootm 80700000; fi; fi"
 #define CONFIG_BOOTARGS \
 		"console=ttyS0,115200n8 " \
 		"root=/dev/mmcblk0p2 rw rootwait ip=off"
+#endif
+
+#define CONFIG_BOOTDELAY	3
+#define CONFIG_BOOTCOMMAND	"ext2load mmc 0 0x80700000 boot/uImage; bootm 0x80700000"
+#define CONFIG_BOOTARGS \
+		"console=ttyS0,115200n8 " \
+		"root=/dev/mmcblk0p1 rw rootwait rootfstype=ext2 ip=off " \
+		"kgdb=ttyS0 kgdboc=ttyS0,115200 kgdbwait "
+
 
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_VERSION_VARIABLE
