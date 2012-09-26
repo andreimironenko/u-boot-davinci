@@ -69,3 +69,8 @@ cscope.*
 /onenand_ipl/onenand-ipl*
 /onenand_ipl/board/*/onenand*
 /onenand_ipl/board/*/*.S
+
+#Eclipse project meta data
+.cproject
+.project
+.settings
