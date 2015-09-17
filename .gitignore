@@ -74,3 +74,6 @@ cscope.*
 .cproject
 .project
 .settings
+
+tools/env/fw_printenv-arm
+tools/mkimage-arm
