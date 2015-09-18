@@ -77,3 +77,6 @@ cscope.*
 
 tools/env/fw_printenv-arm
 tools/mkimage-arm
+arch/arm/include/asm/arch-davinci/arch-davinci
+arch/arm/include/asm/asm
+
